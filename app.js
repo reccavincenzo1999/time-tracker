@@ -329,6 +329,44 @@ function loadLocalEntries() {
 }
 
 // Google Sheets Integration
+async function postToAppsScript(payload) {
+    const response = await fetch(CONFIG.appsScriptUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        mode: 'cors',
+        redirect: 'follow',
+        cache: 'no-store'
+    });
+
+    if (response.type === 'opaque') {
+        return;
+    }
+
+    if (!response.ok) {
+        let errorDetails = `Errore API: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            if (errorData && errorData.error && errorData.error.message) {
+                errorDetails = `Errore API ${response.status}: ${errorData.error.message}`;
+            }
+        } catch (parseError) {
+            // Keep default errorDetails when response is not JSON.
+        }
+        throw new Error(errorDetails);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+        const data = await response.json();
+        if (data && data.success === false) {
+            throw new Error(data.error || 'Errore Apps Script');
+        }
+    }
+}
+
 async function syncToGoogleSheets(entry) {
     if (!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl === 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE') {
         showError('Configura appsScriptUrl in app.js');
@@ -353,31 +391,17 @@ async function syncToGoogleSheets(entry) {
             id: entry.id
         };
 
-        const response = await fetch(CONFIG.appsScriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-        
-        if (!response.ok) {
-            let errorDetails = `Errore API: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                if (errorData && errorData.error && errorData.error.message) {
-                    errorDetails = `Errore API ${response.status}: ${errorData.error.message}`;
-                }
-            } catch (parseError) {
-                // Keep default errorDetails when response is not JSON.
-            }
-            throw new Error(errorDetails);
-        }
+        await postToAppsScript(payload);
         
         console.log('Sincronizzato con Google Sheets (Apps Script)');
     } catch (error) {
         console.error('Errore sincronizzazione:', error);
-        showError(`Errore sincronizzazione: ${error.message}`);
+        const message = String(error && error.message ? error.message : error);
+        if (message.toLowerCase().includes('load failed')) {
+            showError('Errore sincronizzazione: load failed (verifica URL Web App e permessi)');
+        } else {
+            showError(`Errore sincronizzazione: ${message}`);
+        }
     } finally {
         hideLoading();
     }

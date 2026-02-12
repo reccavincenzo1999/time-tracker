@@ -38,8 +38,12 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Strategy: Network First, fallback to Cache
 self.addEventListener('fetch', (event) => {
-  // Skip Google Sheets API requests from cache
-  if (event.request.url.includes('sheets.googleapis.com')) {
+  // Skip Google Sheets and Apps Script requests from cache
+  if (
+    event.request.url.includes('sheets.googleapis.com') ||
+    event.request.url.includes('script.google.com') ||
+    event.request.url.includes('script.googleusercontent.com')
+  ) {
     return;
   }
 
