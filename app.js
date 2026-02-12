@@ -123,6 +123,13 @@ function calculateHoursWorked(clockIn, clockOut) {
     return (clockOut - clockIn) / (1000 * 60 * 60);
 }
 
+function formatHoursAndMinutes(clockIn, clockOut) {
+    const totalMinutes = Math.max(0, Math.round((clockOut - clockIn) / (1000 * 60)));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours} h ${minutes} min`;
+}
+
 // UI Updates
 function updateExpectedClockOut() {
     if (expectedEdited) return;
@@ -139,8 +146,7 @@ function updateCalculatedHours() {
         const clockOut = parseDateTime(elements.editClockOutDate.value, elements.editClockOutTime.value);
         const clockIn = new Date(currentEditingEntry.clockInTime);
         if (!isNaN(clockOut)) {
-            const hours = calculateHoursWorked(clockIn, clockOut);
-            elements.calculatedHours.textContent = `${hours.toFixed(2)} ore`;
+            elements.calculatedHours.textContent = formatHoursAndMinutes(clockIn, clockOut);
         }
     }
 }
@@ -337,6 +343,7 @@ function renderEntries() {
         const expected = new Date(entry.expectedClockOutTime);
         const clockOut = entry.clockOutTime ? new Date(entry.clockOutTime) : null;
         const hoursWorked = clockOut ? calculateHoursWorked(clockIn, clockOut) : null;
+        const formattedWorked = clockOut ? formatHoursAndMinutes(clockIn, clockOut) : null;
         
         return `
             <div class="entry-card">
@@ -358,7 +365,7 @@ function renderEntries() {
                 ${hoursWorked !== null ? `
                     <div class="entry-row">
                         <span class="entry-label">Ore Lavorate:</span>
-                        <span class="entry-value">${hoursWorked.toFixed(2)} ore</span>
+                        <span class="entry-value">${formattedWorked}</span>
                     </div>
                 ` : ''}
                 <div class="entry-actions">
