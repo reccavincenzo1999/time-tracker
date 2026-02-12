@@ -9,6 +9,8 @@ const CONFIG = {
 // State Management
 let workEntries = [];
 let currentEditingEntry = null;
+let currentEntryEditId = null;
+let expectedEdited = false;
 
 // DOM Elements
 const elements = {
@@ -19,6 +21,7 @@ const elements = {
     
     // Add Modal
     addModal: document.getElementById('addModal'),
+    addModalTitle: document.getElementById('addModalTitle'),
     closeAddModal: document.getElementById('closeAddModal'),
     cancelAddBtn: document.getElementById('cancelAddBtn'),
     saveEntryBtn: document.getElementById('saveEntryBtn'),
@@ -28,7 +31,8 @@ const elements = {
     clockOutGroup: document.getElementById('clockOutGroup'),
     clockOutDate: document.getElementById('clockOutDate'),
     clockOutTime: document.getElementById('clockOutTime'),
-    expectedClockOut: document.getElementById('expectedClockOut'),
+    expectedDate: document.getElementById('expectedDate'),
+    expectedTime: document.getElementById('expectedTime'),
     
     // Edit Modal
     editModal: document.getElementById('editModal'),
@@ -63,6 +67,8 @@ function setupEventListeners() {
     elements.hasClockOut.addEventListener('change', toggleClockOutFields);
     elements.clockInDate.addEventListener('change', updateExpectedClockOut);
     elements.clockInTime.addEventListener('change', updateExpectedClockOut);
+    elements.expectedDate.addEventListener('change', () => { expectedEdited = true; });
+    elements.expectedTime.addEventListener('change', () => { expectedEdited = true; });
     
     elements.editClockOutDate.addEventListener('change', updateCalculatedHours);
     elements.editClockOutTime.addEventListener('change', updateCalculatedHours);
@@ -83,6 +89,7 @@ function setDefaultDateTime() {
     elements.clockInTime.value = formatTime(now);
     elements.clockOutDate.valueAsDate = now;
     elements.clockOutTime.value = formatTime(now);
+    expectedEdited = false;
     updateExpectedClockOut();
 }
 
@@ -118,10 +125,12 @@ function calculateHoursWorked(clockIn, clockOut) {
 
 // UI Updates
 function updateExpectedClockOut() {
+    if (expectedEdited) return;
     const clockIn = parseDateTime(elements.clockInDate.value, elements.clockInTime.value);
     if (!isNaN(clockIn)) {
         const expected = calculateExpectedClockOut(clockIn);
-        elements.expectedClockOut.textContent = formatDate(expected);
+        elements.expectedDate.valueAsDate = expected;
+        elements.expectedTime.value = formatTime(expected);
     }
 }
 
@@ -166,13 +175,48 @@ function hideError() {
 
 // Modal Management
 function openAddModal() {
+    currentEntryEditId = null;
+    expectedEdited = false;
     setDefaultDateTime();
     elements.hasClockOut.checked = false;
     toggleClockOutFields();
+    elements.addModalTitle.textContent = 'Nuovo Ingresso';
+    elements.saveEntryBtn.textContent = 'Salva';
+    elements.addModal.classList.remove('hidden');
+}
+
+function openEditEntryModal(entry) {
+    currentEntryEditId = entry.id;
+    expectedEdited = false;
+    const clockIn = new Date(entry.clockInTime);
+    elements.clockInDate.valueAsDate = clockIn;
+    elements.clockInTime.value = formatTime(clockIn);
+
+    const expected = entry.expectedClockOutTime
+        ? new Date(entry.expectedClockOutTime)
+        : calculateExpectedClockOut(clockIn);
+    elements.expectedDate.valueAsDate = expected;
+    elements.expectedTime.value = formatTime(expected);
+
+    if (entry.clockOutTime) {
+        const clockOut = new Date(entry.clockOutTime);
+        elements.hasClockOut.checked = true;
+        elements.clockOutDate.valueAsDate = clockOut;
+        elements.clockOutTime.value = formatTime(clockOut);
+    } else {
+        elements.hasClockOut.checked = false;
+    }
+
+    toggleClockOutFields();
+    updateExpectedClockOut();
+    elements.addModalTitle.textContent = 'Modifica Ingresso';
+    elements.saveEntryBtn.textContent = 'Aggiorna';
     elements.addModal.classList.remove('hidden');
 }
 
 function closeAddModal() {
+    currentEntryEditId = null;
+    expectedEdited = false;
     elements.addModal.classList.add('hidden');
 }
 
@@ -196,24 +240,45 @@ function closeEditModal() {
 // Entry Management
 function saveEntry() {
     const clockIn = parseDateTime(elements.clockInDate.value, elements.clockInTime.value);
+    const expectedClockOut = parseDateTime(elements.expectedDate.value, elements.expectedTime.value);
     
     let clockOut = null;
     if (elements.hasClockOut.checked) {
         clockOut = parseDateTime(elements.clockOutDate.value, elements.clockOutTime.value);
     }
     
+    const expectedValue = !isNaN(expectedClockOut)
+        ? expectedClockOut
+        : calculateExpectedClockOut(clockIn);
+
+    if (currentEntryEditId) {
+        const index = workEntries.findIndex(e => e.id === currentEntryEditId);
+        if (index !== -1) {
+            workEntries[index] = {
+                ...workEntries[index],
+                clockInTime: clockIn.toISOString(),
+                expectedClockOutTime: expectedValue.toISOString(),
+                clockOutTime: clockOut ? clockOut.toISOString() : null
+            };
+        }
+        saveLocalEntries();
+        renderEntries();
+        closeAddModal();
+        return;
+    }
+
     const entry = {
         id: generateId(),
         clockInTime: clockIn.toISOString(),
-        expectedClockOutTime: calculateExpectedClockOut(clockIn).toISOString(),
+        expectedClockOutTime: expectedValue.toISOString(),
         clockOutTime: clockOut ? clockOut.toISOString() : null
     };
-    
+
     workEntries.unshift(entry);
     saveLocalEntries();
     renderEntries();
     closeAddModal();
-    
+
     syncToGoogleSheets(entry);
 }
 
@@ -296,6 +361,7 @@ function renderEntries() {
                     </div>
                 ` : ''}
                 <div class="entry-actions">
+                    <button class="btn-edit" onclick="editEntry('${entry.id}')">Modifica</button>
                     <button class="btn-delete" onclick="deleteEntry('${entry.id}')">Elimina</button>
                 </div>
             </div>
@@ -312,6 +378,13 @@ window.editClockOut = function(id) {
 
 window.deleteEntry = function(id) {
     deleteEntryById(id);
+};
+
+window.editEntry = function(id) {
+    const entry = workEntries.find(e => e.id === id);
+    if (entry) {
+        openEditEntryModal(entry);
+    }
 };
 
 // Local Storage
