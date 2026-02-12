@@ -3,7 +3,7 @@ const CONFIG = {
     apiKey: 'AIzaSyAzOowlr95IQNwC3RSEH6nZH5fZObgRD_E',
     spreadsheetId: '1DAgMwHbxGp-8OMtCrk6JlB6MFSdjzxlL05oW2wV-a50',
     sheetName: 'TimeTracking',
-    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxAPf0U2EVGzfCTuyO1BHVp09ugsihLRWZYsg_qfUpVqRjZJocufgIO5vWEoj82abBd/exec'
+    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxjGTK7GUTFexTgAnMLBgskUEXbOsu2FrdQz4RRz8eZmRR8AfBtPBauyXk9wmi6feSWQg/exec'
 };
 
 // State Management
@@ -310,7 +310,7 @@ function deleteEntryById(id) {
     if (entryIndex === -1) return;
 
     const confirmDelete = window.confirm(
-        'Eliminare questo ingresso? Verra rimosso solo dal dispositivo.'
+        'Eliminare questo ingresso? Verrà rimosso anche dal foglio Google.'
     );
     if (!confirmDelete) return;
 
@@ -318,9 +318,11 @@ function deleteEntryById(id) {
         closeEditModal();
     }
 
+    const entryToDelete = workEntries[entryIndex];
     workEntries.splice(entryIndex, 1);
     saveLocalEntries();
     renderEntries();
+    syncToGoogleSheets(entryToDelete, 'delete');
 }
 
 function generateId() {
