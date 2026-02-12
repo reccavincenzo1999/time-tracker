@@ -38,7 +38,6 @@ const elements = {
     cancelEditBtn: document.getElementById('cancelEditBtn'),
     saveClockOutBtn: document.getElementById('saveClockOutBtn'),
     editClockIn: document.getElementById('editClockIn'),
-    editClockOutDate: document.getElementById('editClockOutDate'),
     editClockOutTime: document.getElementById('editClockOutTime'),
     calculatedHours: document.getElementById('calculatedHours')
 };
@@ -67,7 +66,6 @@ function setupEventListeners() {
     elements.clockInTime.addEventListener('change', updateExpectedClockOut);
     elements.expectedTime.addEventListener('change', () => { expectedEdited = true; });
     
-    elements.editClockOutDate.addEventListener('change', updateCalculatedHours);
     elements.editClockOutTime.addEventListener('change', updateCalculatedHours);
     
     // Close modals on background click
@@ -156,9 +154,9 @@ function updateExpectedClockOut() {
 
 function updateCalculatedHours() {
     if (currentEditingEntry) {
-        const clockOut = parseDateTime(elements.editClockOutDate.value, elements.editClockOutTime.value);
         const clockIn = new Date(currentEditingEntry.clockInTime);
-        if (!isNaN(clockOut)) {
+        const clockOut = buildExpectedClockOut(clockIn, elements.editClockOutTime.value);
+        if (clockOut && !isNaN(clockOut)) {
             elements.calculatedHours.textContent = formatHoursAndMinutes(clockIn, clockOut);
         }
     }
@@ -219,7 +217,6 @@ function openEditEntryModal(entry) {
     if (entry.clockOutTime) {
         const clockOut = new Date(entry.clockOutTime);
         elements.hasClockOut.checked = true;
-        elements.clockOutDate.valueAsDate = clockOut;
         elements.clockOutTime.value = formatTime(clockOut);
     } else {
         elements.hasClockOut.checked = false;
@@ -241,10 +238,11 @@ function closeAddModal() {
 function openEditModal(entry) {
     currentEditingEntry = entry;
     elements.editClockIn.textContent = formatDate(entry.clockInTime);
-    
-    const expected = new Date(entry.expectedClockOutTime);
-    elements.editClockOutDate.valueAsDate = expected;
-    elements.editClockOutTime.value = formatTime(expected);
+
+    const defaultClockOut = entry.clockOutTime
+        ? new Date(entry.clockOutTime)
+        : new Date(entry.expectedClockOutTime);
+    elements.editClockOutTime.value = formatTime(defaultClockOut);
     
     updateCalculatedHours();
     elements.editModal.classList.remove('hidden');
@@ -303,11 +301,12 @@ function saveEntry() {
 
 function saveClockOut() {
     if (!currentEditingEntry) return;
-    
-    const clockOut = parseDateTime(elements.editClockOutDate.value, elements.editClockOutTime.value);
+
+    const clockIn = new Date(currentEditingEntry.clockInTime);
+    const clockOut = buildExpectedClockOut(clockIn, elements.editClockOutTime.value);
     
     const index = workEntries.findIndex(e => e.id === currentEditingEntry.id);
-    if (index !== -1) {
+    if (index !== -1 && clockOut && !isNaN(clockOut)) {
         workEntries[index].clockOutTime = clockOut.toISOString();
         saveLocalEntries();
         renderEntries();
