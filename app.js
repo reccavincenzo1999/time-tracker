@@ -3,7 +3,7 @@ const CONFIG = {
     apiKey: 'AIzaSyAzOowlr95IQNwC3RSEH6nZH5fZObgRD_E',
     spreadsheetId: '1DAgMwHbxGp-8OMtCrk6JlB6MFSdjzxlL05oW2wV-a50',
     sheetName: 'TimeTracking',
-    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxQ4MVJL3441JiMUgp8w_2NqWz_RFvW0sgkbeNtc6Gsp47rNXhSNBcMR6-tAgkp_2DQ9Q/exec'
+    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxAPf0U2EVGzfCTuyO1BHVp09ugsihLRWZYsg_qfUpVqRjZJocufgIO5vWEoj82abBd/exec'
 };
 
 // State Management
@@ -264,6 +264,7 @@ function saveEntry() {
         saveLocalEntries();
         renderEntries();
         closeAddModal();
+        syncToGoogleSheets(workEntries[index], 'update');
         return;
     }
 
@@ -279,7 +280,7 @@ function saveEntry() {
     renderEntries();
     closeAddModal();
 
-    syncToGoogleSheets(entry);
+    syncToGoogleSheets(entry, 'append');
 }
 
 function saveClockOut() {
@@ -294,7 +295,7 @@ function saveClockOut() {
         renderEntries();
         closeEditModal();
         
-        syncToGoogleSheets(workEntries[index]);
+        syncToGoogleSheets(workEntries[index], 'update');
     }
 }
 
@@ -451,7 +452,7 @@ async function postToAppsScriptNoCors(payload) {
     });
 }
 
-async function syncToGoogleSheets(entry) {
+async function syncToGoogleSheets(entry, action) {
     if (!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl === 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE') {
         showError('Configura appsScriptUrl in app.js');
         return;
@@ -467,6 +468,7 @@ async function syncToGoogleSheets(entry) {
         const hours = clockOut ? calculateHoursWorked(clockIn, clockOut) : '';
 
         const payload = {
+            action: action || 'append',
             sheetName: CONFIG.sheetName,
             clockIn: formatDate(clockIn),
             expectedClockOut: formatDate(expected),
