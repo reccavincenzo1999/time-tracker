@@ -330,7 +330,7 @@ function loadLocalEntries() {
 
 // Google Sheets Integration
 async function postToAppsScript(payload) {
-    const response = await fetch(CONFIG.appsScriptUrl, {
+    let response = await fetch(CONFIG.appsScriptUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -367,6 +367,19 @@ async function postToAppsScript(payload) {
     }
 }
 
+async function postToAppsScriptNoCors(payload) {
+    await fetch(CONFIG.appsScriptUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        mode: 'no-cors',
+        redirect: 'follow',
+        cache: 'no-store'
+    });
+}
+
 async function syncToGoogleSheets(entry) {
     if (!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl === 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE') {
         showError('Configura appsScriptUrl in app.js');
@@ -391,17 +404,22 @@ async function syncToGoogleSheets(entry) {
             id: entry.id
         };
 
-        await postToAppsScript(payload);
+        try {
+            await postToAppsScript(payload);
+        } catch (error) {
+            const message = String(error && error.message ? error.message : error);
+            if (message.toLowerCase().includes('load failed')) {
+                await postToAppsScriptNoCors(payload);
+            } else {
+                throw error;
+            }
+        }
         
         console.log('Sincronizzato con Google Sheets (Apps Script)');
     } catch (error) {
         console.error('Errore sincronizzazione:', error);
         const message = String(error && error.message ? error.message : error);
-        if (message.toLowerCase().includes('load failed')) {
-            showError('Errore sincronizzazione: load failed (verifica URL Web App e permessi)');
-        } else {
-            showError(`Errore sincronizzazione: ${message}`);
-        }
+        showError(`Errore sincronizzazione: ${message}`);
     } finally {
         hideLoading();
     }
