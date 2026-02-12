@@ -350,6 +350,11 @@ body {
     font-weight: 600;
 }
 
+.expected-info .expected-time-input {
+    width: 100%;
+    max-width: 240px;
+}
+
 .clock-out-group {
     margin-top: 1rem;
     padding-top: 1rem;
