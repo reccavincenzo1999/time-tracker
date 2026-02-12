@@ -29,7 +29,6 @@ const elements = {
     clockInTime: document.getElementById('clockInTime'),
     hasClockOut: document.getElementById('hasClockOut'),
     clockOutGroup: document.getElementById('clockOutGroup'),
-    clockOutDate: document.getElementById('clockOutDate'),
     clockOutTime: document.getElementById('clockOutTime'),
     expectedTime: document.getElementById('expectedTime'),
     
@@ -85,7 +84,6 @@ function setDefaultDateTime() {
     const now = new Date();
     elements.clockInDate.valueAsDate = now;
     elements.clockInTime.value = formatTime(now);
-    elements.clockOutDate.valueAsDate = now;
     elements.clockOutTime.value = formatTime(now);
     expectedEdited = false;
     updateExpectedClockOut();
@@ -264,7 +262,7 @@ function saveEntry() {
     
     let clockOut = null;
     if (elements.hasClockOut.checked) {
-        clockOut = parseDateTime(elements.clockOutDate.value, elements.clockOutTime.value);
+        clockOut = buildExpectedClockOut(clockIn, elements.clockOutTime.value);
     }
     
     const expectedValue = expectedClockOut && !isNaN(expectedClockOut)
