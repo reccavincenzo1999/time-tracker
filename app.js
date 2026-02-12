@@ -362,13 +362,22 @@ async function syncToGoogleSheets(entry) {
         });
         
         if (!response.ok) {
-            throw new Error(`Errore API: ${response.status}`);
+            let errorDetails = `Errore API: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                if (errorData && errorData.error && errorData.error.message) {
+                    errorDetails = `Errore API ${response.status}: ${errorData.error.message}`;
+                }
+            } catch (parseError) {
+                // Keep default errorDetails when response is not JSON.
+            }
+            throw new Error(errorDetails);
         }
         
         console.log('Sincronizzato con Google Sheets');
     } catch (error) {
         console.error('Errore sincronizzazione:', error);
-        showError('Errore sincronizzazione con Google Sheets');
+        showError(`Errore sincronizzazione: ${error.message}`);
     } finally {
         hideLoading();
     }
@@ -389,7 +398,16 @@ async function loadEntriesFromGoogleSheets() {
         const response = await fetch(url);
         
         if (!response.ok) {
-            throw new Error(`Errore API: ${response.status}`);
+            let errorDetails = `Errore API: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                if (errorData && errorData.error && errorData.error.message) {
+                    errorDetails = `Errore API ${response.status}: ${errorData.error.message}`;
+                }
+            } catch (parseError) {
+                // Keep default errorDetails when response is not JSON.
+            }
+            throw new Error(errorDetails);
         }
         
         const data = await response.json();
@@ -416,7 +434,7 @@ async function loadEntriesFromGoogleSheets() {
         console.log('Caricato da Google Sheets');
     } catch (error) {
         console.error('Errore caricamento:', error);
-        showError('Errore caricamento da Google Sheets');
+        showError(`Errore caricamento: ${error.message}`);
     } finally {
         hideLoading();
     }
