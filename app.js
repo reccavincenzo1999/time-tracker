@@ -1,7 +1,7 @@
 // Configuration - REPLACE WITH YOUR VALUES
 const CONFIG = {
-    apiKey: 'YOUR_API_KEY_HERE',
-    spreadsheetId: 'YOUR_SPREADSHEET_ID_HERE',
+    apiKey: 'AIzaSyAzOowlr95IQNwC3RSEH6nZH5fZObgRD_E',
+    spreadsheetId: '1DAgMwHbxGp-8OMtCrk6JlB6MFSdjzxlL05oW2wV-a50',
     sheetName: 'TimeTracking'
 };
 
