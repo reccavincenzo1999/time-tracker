@@ -310,6 +310,8 @@ body {
 .form-group input[type="date"],
 .form-group input[type="time"] {
     width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
     padding: 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -352,7 +354,8 @@ body {
 
 .expected-info .expected-time-input {
     width: 100%;
-    max-width: 240px;
+    max-width: 320px;
+    margin: 0 auto;
 }
 
 .clock-out-group {
