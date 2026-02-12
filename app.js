@@ -234,6 +234,24 @@ function saveClockOut() {
     }
 }
 
+function deleteEntryById(id) {
+    const entryIndex = workEntries.findIndex(e => e.id === id);
+    if (entryIndex === -1) return;
+
+    const confirmDelete = window.confirm(
+        'Eliminare questo ingresso? Verra rimosso solo dal dispositivo.'
+    );
+    if (!confirmDelete) return;
+
+    if (currentEditingEntry && currentEditingEntry.id === id) {
+        closeEditModal();
+    }
+
+    workEntries.splice(entryIndex, 1);
+    saveLocalEntries();
+    renderEntries();
+}
+
 function generateId() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -278,6 +296,9 @@ function renderEntries() {
                         <span class="entry-value">${hoursWorked.toFixed(2)} ore</span>
                     </div>
                 ` : ''}
+                <div class="entry-actions">
+                    <button class="btn-delete" onclick="deleteEntry('${entry.id}')">Elimina</button>
+                </div>
             </div>
         `;
     }).join('');
@@ -288,6 +309,10 @@ window.editClockOut = function(id) {
     if (entry) {
         openEditModal(entry);
     }
+};
+
+window.deleteEntry = function(id) {
+    deleteEntryById(id);
 };
 
 // Local Storage
