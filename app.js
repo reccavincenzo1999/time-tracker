@@ -2,7 +2,8 @@
 const CONFIG = {
     apiKey: 'AIzaSyAzOowlr95IQNwC3RSEH6nZH5fZObgRD_E',
     spreadsheetId: '1DAgMwHbxGp-8OMtCrk6JlB6MFSdjzxlL05oW2wV-a50',
-    sheetName: 'TimeTracking'
+    sheetName: 'TimeTracking',
+    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbwYM0dQYqIz2BVdII_gjQMCLP_vAQV0LPkfXvbBGWJ0TzUh9LaBsWIO29rsLQur2oGi9A/exec'
 };
 
 // State Management
@@ -329,8 +330,8 @@ function loadLocalEntries() {
 
 // Google Sheets Integration
 async function syncToGoogleSheets(entry) {
-    if (CONFIG.apiKey === 'YOUR_API_KEY_HERE' || CONFIG.spreadsheetId === 'YOUR_SPREADSHEET_ID_HERE') {
-        console.warn('Google Sheets non configurato. Configurare CONFIG in app.js');
+    if (!CONFIG.appsScriptUrl || CONFIG.appsScriptUrl === 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+        showError('Configura appsScriptUrl in app.js');
         return;
     }
     
@@ -338,27 +339,26 @@ async function syncToGoogleSheets(entry) {
     hideError();
     
     try {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${CONFIG.sheetName}!A:E:append?valueInputOption=USER_ENTERED&key=${CONFIG.apiKey}`;
-        
         const clockIn = new Date(entry.clockInTime);
         const expected = new Date(entry.expectedClockOutTime);
         const clockOut = entry.clockOutTime ? new Date(entry.clockOutTime) : null;
         const hours = clockOut ? calculateHoursWorked(clockIn, clockOut) : '';
-        
-        const values = [
-            formatDate(clockIn),
-            formatDate(expected),
-            clockOut ? formatDate(clockOut) : '',
-            hours ? hours.toFixed(2) : '',
-            entry.id
-        ];
-        
-        const response = await fetch(url, {
+
+        const payload = {
+            sheetName: CONFIG.sheetName,
+            clockIn: formatDate(clockIn),
+            expectedClockOut: formatDate(expected),
+            clockOut: clockOut ? formatDate(clockOut) : '',
+            hours: hours ? hours.toFixed(2) : '',
+            id: entry.id
+        };
+
+        const response = await fetch(CONFIG.appsScriptUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ values: [values] })
+            body: JSON.stringify(payload)
         });
         
         if (!response.ok) {
@@ -374,7 +374,7 @@ async function syncToGoogleSheets(entry) {
             throw new Error(errorDetails);
         }
         
-        console.log('Sincronizzato con Google Sheets');
+        console.log('Sincronizzato con Google Sheets (Apps Script)');
     } catch (error) {
         console.error('Errore sincronizzazione:', error);
         showError(`Errore sincronizzazione: ${error.message}`);
