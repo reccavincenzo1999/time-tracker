@@ -12,7 +12,6 @@ let currentEditingEntry = null;
 
 // DOM Elements
 const elements = {
-    refreshBtn: document.getElementById('refreshBtn'),
     addBtn: document.getElementById('addBtn'),
     loadingIndicator: document.getElementById('loadingIndicator'),
     errorMessage: document.getElementById('errorMessage'),
@@ -52,7 +51,6 @@ function init() {
 
 // Event Listeners
 function setupEventListeners() {
-    elements.refreshBtn.addEventListener('click', refreshLocalEntries);
     elements.addBtn.addEventListener('click', openAddModal);
     elements.closeAddModal.addEventListener('click', closeAddModal);
     elements.cancelAddBtn.addEventListener('click', closeAddModal);
@@ -76,11 +74,6 @@ function setupEventListeners() {
     elements.editModal.addEventListener('click', (e) => {
         if (e.target === elements.editModal) closeEditModal();
     });
-}
-
-function refreshLocalEntries() {
-    loadLocalEntries();
-    renderEntries();
 }
 
 // Date/Time Utilities
