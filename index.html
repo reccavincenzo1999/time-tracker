@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Time Tracker">
+    <meta name="theme-color" content="#007AFF">
+    
+    <title>Time Tracker</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <button id="refreshBtn" class="btn-icon" aria-label="Aggiorna">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                </svg>
+            </button>
+            <h1>Time Tracker</h1>
+            <button id="addBtn" class="btn-icon" aria-label="Aggiungi">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Caricamento...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message hidden"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section class="entries-section">
+                <h2>Storico Ingressi</h2>
+                <div id="entriesList" class="entries-list">
+                    <p class="empty-state">Nessun ingresso registrato</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Add Entry Modal -->
+        <div id="addModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Nuovo Ingresso</h2>
+                    <button id="closeAddModal" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="clockInDate">Data Entrata</label>
+                        <input type="date" id="clockInDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clockInTime">Ora Entrata</label>
+                        <input type="time" id="clockInTime" required>
+                    </div>
+                    
+                    <div class="expected-info">
+                        <strong>Uscita Prevista (dopo 8 ore):</strong>
+                        <p id="expectedClockOut">--:--</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="hasClockOut">
+                            <span>Aggiungi uscita effettiva</span>
+                        </label>
+                    </div>
+
+                    <div id="clockOutGroup" class="clock-out-group hidden">
+                        <div class="form-group">
+                            <label for="clockOutDate">Data Uscita</label>
+                            <input type="date" id="clockOutDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="clockOutTime">Ora Uscita</label>
+                            <input type="time" id="clockOutTime">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelAddBtn" class="btn btn-secondary">Annulla</button>
+                    <button id="saveEntryBtn" class="btn btn-primary">Salva</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Clock Out Modal -->
+        <div id="editModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Aggiungi Uscita</h2>
+                    <button id="closeEditModal" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="info-row">
+                        <strong>Entrata:</strong>
+                        <span id="editClockIn">--</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editClockOutDate">Data Uscita</label>
+                        <input type="date" id="editClockOutDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClockOutTime">Ora Uscita</label>
+                        <input type="time" id="editClockOutTime" required>
+                    </div>
+
+                    <div class="info-row">
+                        <strong>Ore Lavorate:</strong>
+                        <span id="calculatedHours">0.00 ore</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelEditBtn" class="btn btn-secondary">Annulla</button>
+                    <button id="saveClockOutBtn" class="btn btn-primary">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.error('Service Worker registration failed:', err));
+        }
+    </script>
+</body>
+</html>
