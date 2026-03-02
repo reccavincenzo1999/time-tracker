@@ -1,12 +1,12 @@
 {
-  "name": "Time Tracker",
-  "short_name": "TimeTracker",
-  "description": "Traccia i tuoi orari di lavoro con sincronizzazione Google Sheets",
+  "name": "Poste Time Tracker",
+  "short_name": "PosteTime",
+  "description": "App aziendale Poste Italiane per il tracciamento degli orari di lavoro con Google Sheets",
   "start_url": "/time-tracker/",
   "scope": "/time-tracker/",
   "display": "standalone",
-  "background_color": "#F2F2F7",
-  "theme_color": "#007AFF",
+  "background_color": "#f5f7fa",
+  "theme_color": "#FFD700",
   "orientation": "portrait",
   "icons": [
     {

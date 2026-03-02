@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Time Tracker">
-    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-title" content="Poste Time Tracker">
+    <meta name="theme-color" content="#FFD700">
     
-    <title>Time Tracker</title>
+    <title>Poste Time Tracker</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -19,7 +19,12 @@
     <div class="app">
         <!-- Header -->
         <header class="header">
-            <h1>Time Tracker</h1>
+            <div class="header-brand">
+                <div class="logo">
+                    <img src="icon-192.png" alt="Poste Logo" width="32" height="32">
+                </div>
+                <h1>Poste Time Tracker</h1>
+            </div>
             <button id="addBtn" class="btn-icon" aria-label="Aggiungi">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -104,11 +109,6 @@
                     <div class="info-row">
                         <strong>Entrata:</strong>
                         <span id="editClockIn">--</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editClockOutDate">Data Uscita</label>
-                        <input type="date" id="editClockOutDate" required>
                     </div>
                     <div class="form-group">
                         <label for="editClockOutTime">Ora Uscita</label>
