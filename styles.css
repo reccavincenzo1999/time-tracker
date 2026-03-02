@@ -5,19 +5,19 @@
 }
 
 :root {
-    --primary-color: #FFD700;
-    --primary-dark: #E6C200;
-    --secondary-color: #2C3E50;
+    --primary-color: #003d7a;
+    --primary-dark: #002a5c;
+    --secondary-color: #FFFFFF;
     --success-color: #27AE60;
     --danger-color: #E74C3C;
     --warning-color: #F39C12;
-    --background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --background: linear-gradient(135deg, #fffef7 0%, #fffacd 100%);
     --card-background: #FFFFFF;
     --text-primary: #2C3E50;
     --text-secondary: #7F8C8D;
     --border-color: #E8E8E8;
     --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    --header-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    --header-gradient: linear-gradient(135deg, #003d7a 0%, #0052a3 100%);
 }
 
 body {
@@ -154,7 +154,7 @@ body {
     transform: translateX(-50%);
     width: 50px;
     height: 4px;
-    background: rgba(255, 215, 0, 0.3);
+    background: rgba(0, 61, 122, 0.3);
     border-radius: 2px;
 }
 
@@ -196,7 +196,7 @@ body {
     background: rgba(255, 255, 255, 0.5);
     border-radius: 16px;
     backdrop-filter: blur(10px);
-    border: 1px dashed rgba(255, 215, 0, 0.3);
+    border: 1px dashed rgba(0, 61, 122, 0.3);
 }
 
 /* Entry Card */
@@ -206,14 +206,14 @@ body {
     padding: 1.25rem;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 215, 0, 0.2);
+    border: 1px solid rgba(0, 61, 122, 0.2);
     backdrop-filter: blur(10px);
 }
 
 .entry-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border-color: rgba(255, 215, 0, 0.4);
+    border-color: rgba(0, 61, 122, 0.4);
 }
 
 .entry-row {
@@ -254,12 +254,12 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 61, 122, 0.3);
 }
 
 .btn-add-clockout:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 61, 122, 0.4);
 }
 
 .btn-add-clockout:active {
@@ -337,7 +337,7 @@ body {
     overflow-y: auto;
     animation: slideUp 0.3s;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 215, 0, 0.2);
+    border: 1px solid rgba(0, 61, 122, 0.2);
 }
 
 @keyframes slideUp {
@@ -478,13 +478,13 @@ body {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: var(--secondary-color);
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 61, 122, 0.3);
     transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 61, 122, 0.4);
 }
 
 .btn-primary:active {
