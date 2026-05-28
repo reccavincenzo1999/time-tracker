@@ -43,6 +43,14 @@ const elements = {
     editClockOutTime: document.getElementById('editClockOutTime'),
     calculatedHours: document.getElementById('calculatedHours'),
 
+    // Lunch Actual End Modal
+    lunchActualEndModal: document.getElementById('lunchActualEndModal'),
+    closeLunchActualEndModalBtn: document.getElementById('closeLunchActualEndModalBtn'),
+    cancelLunchActualEndBtn: document.getElementById('cancelLunchActualEndBtn'),
+    saveLunchActualEndBtn: document.getElementById('saveLunchActualEndBtn'),
+    lunchActualEndStartDisplay: document.getElementById('lunchActualEndStartDisplay'),
+    lunchActualEndTimeInput: document.getElementById('lunchActualEndTimeInput'),
+
     // Lunch Break Modal
     lunchBreakModal: document.getElementById('lunchBreakModal'),
     closeLunchBreakModalBtn: document.getElementById('closeLunchBreakModalBtn'),
@@ -87,6 +95,13 @@ function setupEventListeners() {
     elements.lunchBreakStartInput.addEventListener('change', updateLunchBreakExpectedEnd);
     elements.lunchBreakExpectedEndInput.addEventListener('change', () => { lunchBreakExpectedEdited = true; });
     elements.hasLunchBreakActualEnd.addEventListener('change', toggleLunchBreakActualEnd);
+
+    elements.closeLunchActualEndModalBtn.addEventListener('click', closeLunchActualEndModal);
+    elements.cancelLunchActualEndBtn.addEventListener('click', closeLunchActualEndModal);
+    elements.saveLunchActualEndBtn.addEventListener('click', saveLunchActualEnd);
+    elements.lunchActualEndModal.addEventListener('click', (e) => {
+        if (e.target === elements.lunchActualEndModal) closeLunchActualEndModal();
+    });
 
     // Close modals on background click
     elements.addModal.addEventListener('click', (e) => {
@@ -353,6 +368,36 @@ function closeLunchBreakModal() {
     elements.lunchBreakModal.classList.add('hidden');
 }
 
+function openLunchActualEndModal(entry) {
+    currentLunchBreakEntryId = entry.id;
+    elements.lunchActualEndStartDisplay.textContent = formatDate(new Date(entry.lunchBreakStart));
+    const defaultEnd = entry.lunchBreakExpectedEnd
+        ? new Date(entry.lunchBreakExpectedEnd)
+        : new Date(new Date(entry.lunchBreakStart).getTime() + 30 * 60 * 1000);
+    elements.lunchActualEndTimeInput.value = formatTime(defaultEnd);
+    elements.lunchActualEndModal.classList.remove('hidden');
+}
+
+function closeLunchActualEndModal() {
+    currentLunchBreakEntryId = null;
+    elements.lunchActualEndModal.classList.add('hidden');
+}
+
+function saveLunchActualEnd() {
+    if (!currentLunchBreakEntryId) return;
+    const index = workEntries.findIndex(e => e.id === currentLunchBreakEntryId);
+    if (index === -1) return;
+    const entry = workEntries[index];
+    const clockIn = new Date(entry.clockInTime);
+    const actualEnd = buildExpectedClockOut(clockIn, elements.lunchActualEndTimeInput.value);
+    if (!actualEnd || isNaN(actualEnd)) return;
+    workEntries[index].lunchBreakActualEnd = actualEnd.toISOString();
+    saveLocalEntries();
+    renderEntries();
+    closeLunchActualEndModal();
+    syncToGoogleSheets(workEntries[index], 'update');
+}
+
 function saveLunchBreak() {
     if (!currentLunchBreakEntryId) return;
     const index = workEntries.findIndex(e => e.id === currentLunchBreakEntryId);
@@ -600,7 +645,7 @@ window.editLunchBreak = function(id) {
 
 window.addLunchBreakActualEnd = function(id) {
     const entry = workEntries.find(e => e.id === id);
-    if (entry) openLunchBreakModal(entry, true);
+    if (entry) openLunchActualEndModal(entry);
 };
 
 window.deleteLunchBreak = function(id) {
