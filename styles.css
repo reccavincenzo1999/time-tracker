@@ -563,35 +563,78 @@ body {
 }
 
 .lunch-break-duration-row {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    margin-bottom: 1rem;
+    display: none;
 }
 
-.form-group-inline {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    max-width: 120px;
+/* Lunch Break Mini Table */
+.lunch-break-table {
+    background: #E3F2FD;
+    border-radius: 10px;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: 1px solid #90CAF9;
 }
 
-.form-group-inline label {
+.lunch-break-table-header {
+    color: #1565C0;
+    font-weight: 700;
+    font-size: 0.875rem;
     margin-bottom: 0.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.lunch-break-table-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(144, 202, 249, 0.4);
+    font-size: 0.875rem;
+}
+
+.lunch-label {
+    color: #1565C0;
+    font-size: 0.8rem;
+}
+
+.lunch-value {
     font-weight: 500;
     font-size: 0.875rem;
 }
 
-.form-group-inline input[type="number"] {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1.25rem;
+.lunch-value.primary {
+    color: var(--primary-color);
+}
+
+.lunch-value.success {
+    color: var(--success-color);
+}
+
+.lunch-break-table-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(144, 202, 249, 0.4);
+}
+
+.btn-add-lunch-actual {
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
     font-weight: 600;
-    text-align: center;
-    background: var(--background);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-lunch-actual:active {
+    background: #0d47a1;
 }
 
 .lunch-break-note {

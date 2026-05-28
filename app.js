@@ -12,6 +12,7 @@ let currentEditingEntry = null;
 let currentEntryEditId = null;
 let expectedEdited = false;
 let currentLunchBreakEntryId = null;
+let lunchBreakExpectedEdited = false;
 
 // DOM Elements
 const elements = {
@@ -47,8 +48,11 @@ const elements = {
     closeLunchBreakModalBtn: document.getElementById('closeLunchBreakModalBtn'),
     cancelLunchBreakBtn: document.getElementById('cancelLunchBreakBtn'),
     saveLunchBreakBtn: document.getElementById('saveLunchBreakBtn'),
-    lunchBreakHoursInput: document.getElementById('lunchBreakHoursInput'),
-    lunchBreakMinutesInput: document.getElementById('lunchBreakMinutesInput')
+    lunchBreakStartInput: document.getElementById('lunchBreakStartInput'),
+    lunchBreakExpectedEndInput: document.getElementById('lunchBreakExpectedEndInput'),
+    hasLunchBreakActualEnd: document.getElementById('hasLunchBreakActualEnd'),
+    lunchBreakActualEndGroup: document.getElementById('lunchBreakActualEndGroup'),
+    lunchBreakActualEndInput: document.getElementById('lunchBreakActualEndInput')
 };
 
 // Initialize App
@@ -80,7 +84,10 @@ function setupEventListeners() {
     elements.closeLunchBreakModalBtn.addEventListener('click', closeLunchBreakModal);
     elements.cancelLunchBreakBtn.addEventListener('click', closeLunchBreakModal);
     elements.saveLunchBreakBtn.addEventListener('click', saveLunchBreak);
-    
+    elements.lunchBreakStartInput.addEventListener('change', updateLunchBreakExpectedEnd);
+    elements.lunchBreakExpectedEndInput.addEventListener('change', () => { lunchBreakExpectedEdited = true; });
+    elements.hasLunchBreakActualEnd.addEventListener('change', toggleLunchBreakActualEnd);
+
     // Close modals on background click
     elements.addModal.addEventListener('click', (e) => {
         if (e.target === elements.addModal) closeAddModal();
@@ -165,6 +172,20 @@ function formatMinutesToHoursAndMinutes(totalMinutes) {
     return `${m} min`;
 }
 
+function getLunchBreakMinutes(entry) {
+    if (entry.lunchBreakStart) {
+        const start = new Date(entry.lunchBreakStart);
+        const end = entry.lunchBreakActualEnd
+            ? new Date(entry.lunchBreakActualEnd)
+            : entry.lunchBreakExpectedEnd
+                ? new Date(entry.lunchBreakExpectedEnd)
+                : null;
+        if (end) return Math.max(0, Math.round((end - start) / (1000 * 60)));
+    }
+    if (entry.lunchBreakMinutes != null) return entry.lunchBreakMinutes;
+    return 0;
+}
+
 // UI Updates
 function updateExpectedClockOut() {
     if (expectedEdited) return;
@@ -182,6 +203,26 @@ function updateCalculatedHours() {
         if (clockOut && !isNaN(clockOut)) {
             elements.calculatedHours.textContent = formatHoursAndMinutes(clockIn, clockOut);
         }
+    }
+}
+
+function updateLunchBreakExpectedEnd() {
+    if (lunchBreakExpectedEdited) return;
+    const entry = workEntries.find(e => e.id === currentLunchBreakEntryId);
+    if (!entry) return;
+    const clockIn = new Date(entry.clockInTime);
+    const start = buildExpectedClockOut(clockIn, elements.lunchBreakStartInput.value);
+    if (start && !isNaN(start)) {
+        const expectedEnd = new Date(start.getTime() + 30 * 60 * 1000);
+        elements.lunchBreakExpectedEndInput.value = formatTime(expectedEnd);
+    }
+}
+
+function toggleLunchBreakActualEnd() {
+    if (elements.hasLunchBreakActualEnd.checked) {
+        elements.lunchBreakActualEndGroup.classList.remove('hidden');
+    } else {
+        elements.lunchBreakActualEndGroup.classList.add('hidden');
     }
 }
 
@@ -276,33 +317,67 @@ function closeEditModal() {
     elements.editModal.classList.add('hidden');
 }
 
-function openLunchBreakModal(entry) {
+function openLunchBreakModal(entry, preCheckActualEnd = false) {
     currentLunchBreakEntryId = entry.id;
-    const mins = entry.lunchBreakMinutes || 0;
-    elements.lunchBreakHoursInput.value = Math.floor(mins / 60);
-    elements.lunchBreakMinutesInput.value = mins % 60;
+    lunchBreakExpectedEdited = false;
+    if (entry.lunchBreakStart) {
+        elements.lunchBreakStartInput.value = formatTime(new Date(entry.lunchBreakStart));
+        const expectedEnd = entry.lunchBreakExpectedEnd
+            ? new Date(entry.lunchBreakExpectedEnd)
+            : new Date(new Date(entry.lunchBreakStart).getTime() + 30 * 60 * 1000);
+        elements.lunchBreakExpectedEndInput.value = formatTime(expectedEnd);
+        if (entry.lunchBreakActualEnd || preCheckActualEnd) {
+            elements.hasLunchBreakActualEnd.checked = true;
+            elements.lunchBreakActualEndGroup.classList.remove('hidden');
+            elements.lunchBreakActualEndInput.value = entry.lunchBreakActualEnd
+                ? formatTime(new Date(entry.lunchBreakActualEnd))
+                : elements.lunchBreakExpectedEndInput.value;
+        } else {
+            elements.hasLunchBreakActualEnd.checked = false;
+            elements.lunchBreakActualEndGroup.classList.add('hidden');
+        }
+    } else {
+        const now = new Date();
+        elements.lunchBreakStartInput.value = formatTime(now);
+        const expectedEnd = new Date(now.getTime() + 30 * 60 * 1000);
+        elements.lunchBreakExpectedEndInput.value = formatTime(expectedEnd);
+        elements.hasLunchBreakActualEnd.checked = false;
+        elements.lunchBreakActualEndGroup.classList.add('hidden');
+    }
     elements.lunchBreakModal.classList.remove('hidden');
 }
 
 function closeLunchBreakModal() {
     currentLunchBreakEntryId = null;
+    lunchBreakExpectedEdited = false;
     elements.lunchBreakModal.classList.add('hidden');
 }
 
 function saveLunchBreak() {
     if (!currentLunchBreakEntryId) return;
-    const hours = parseInt(elements.lunchBreakHoursInput.value) || 0;
-    const minutes = parseInt(elements.lunchBreakMinutesInput.value) || 0;
-    const totalMinutes = hours * 60 + minutes;
-
     const index = workEntries.findIndex(e => e.id === currentLunchBreakEntryId);
-    if (index !== -1) {
-        workEntries[index].lunchBreakMinutes = totalMinutes;
-        saveLocalEntries();
-        renderEntries();
-        closeLunchBreakModal();
-        syncToGoogleSheets(workEntries[index], 'update');
+    if (index === -1) return;
+    const entry = workEntries[index];
+    const clockIn = new Date(entry.clockInTime);
+    const lunchStart = buildExpectedClockOut(clockIn, elements.lunchBreakStartInput.value);
+    if (!lunchStart || isNaN(lunchStart)) return;
+    const lunchExpectedEnd = buildExpectedClockOut(clockIn, elements.lunchBreakExpectedEndInput.value)
+        || new Date(lunchStart.getTime() + 30 * 60 * 1000);
+    let lunchActualEnd = null;
+    if (elements.hasLunchBreakActualEnd.checked && elements.lunchBreakActualEndInput.value) {
+        lunchActualEnd = buildExpectedClockOut(clockIn, elements.lunchBreakActualEndInput.value);
     }
+    workEntries[index] = {
+        ...workEntries[index],
+        lunchBreakStart: lunchStart.toISOString(),
+        lunchBreakExpectedEnd: lunchExpectedEnd.toISOString(),
+        lunchBreakActualEnd: lunchActualEnd ? lunchActualEnd.toISOString() : null,
+        lunchBreakMinutes: null
+    };
+    saveLocalEntries();
+    renderEntries();
+    closeLunchBreakModal();
+    syncToGoogleSheets(workEntries[index], 'update');
 }
 
 // Entry Management
@@ -413,24 +488,51 @@ function renderEntries() {
         let formattedWorked = null;
         if (clockOut) {
             const rawMinutes = Math.max(0, Math.round((clockOut - clockIn) / (1000 * 60)));
-            const lunchMins = entry.lunchBreakMinutes != null ? entry.lunchBreakMinutes : 0;
+            const lunchMins = getLunchBreakMinutes(entry);
             const excessMins = lunchMins > 30 ? lunchMins - 30 : 0;
             const effectiveMinutes = Math.max(0, rawMinutes - excessMins);
             formattedWorked = formatMinutesToHoursAndMinutes(effectiveMinutes);
         }
 
-        const lunchBreakRow = (entry.lunchBreakMinutes != null)
-            ? `<div class="entry-row">
-                <span class="entry-label">Pausa pranzo:</span>
-                <div class="lunch-break-info">
-                    <span class="entry-value">${formatMinutesToHoursAndMinutes(entry.lunchBreakMinutes)}</span>
-                    <button class="btn-edit-small" onclick="editLunchBreak('${entry.id}')">Modifica</button>
-                    <button class="btn-delete-small" onclick="deleteLunchBreak('${entry.id}')">Elimina</button>
-                </div>
-            </div>`
-            : '';
+        const hasLunchBreak = entry.lunchBreakStart != null;
+        let lunchBreakSection = '';
+        if (hasLunchBreak) {
+            const lunchStart = new Date(entry.lunchBreakStart);
+            const lunchExpectedEnd = entry.lunchBreakExpectedEnd ? new Date(entry.lunchBreakExpectedEnd) : null;
+            const lunchActualEnd = entry.lunchBreakActualEnd ? new Date(entry.lunchBreakActualEnd) : null;
+            const lunchMins = getLunchBreakMinutes(entry);
+            const durationStr = lunchMins > 0 ? formatMinutesToHoursAndMinutes(lunchMins) : '—';
+            lunchBreakSection = `
+                <div class="lunch-break-table">
+                    <div class="lunch-break-table-header">Pausa Pranzo</div>
+                    <div class="lunch-break-table-row">
+                        <span class="lunch-label">Inizio:</span>
+                        <span class="lunch-value">${formatDate(lunchStart)}</span>
+                    </div>
+                    ${lunchExpectedEnd ? `
+                    <div class="lunch-break-table-row">
+                        <span class="lunch-label">Fine Prevista:</span>
+                        <span class="lunch-value primary">${formatDate(lunchExpectedEnd)}</span>
+                    </div>` : ''}
+                    <div class="lunch-break-table-row">
+                        <span class="lunch-label">Fine Effettiva:</span>
+                        ${lunchActualEnd
+                            ? `<span class="lunch-value success">${formatDate(lunchActualEnd)}</span>`
+                            : `<button class="btn-add-lunch-actual" onclick="addLunchBreakActualEnd('${entry.id}')">Aggiungi</button>`
+                        }
+                    </div>
+                    <div class="lunch-break-table-row">
+                        <span class="lunch-label">Durata:</span>
+                        <span class="lunch-value">${durationStr}</span>
+                    </div>
+                    <div class="lunch-break-table-actions">
+                        <button class="btn-edit-small" onclick="editLunchBreak('${entry.id}')">Modifica</button>
+                        <button class="btn-delete-small" onclick="deleteLunchBreak('${entry.id}')">Elimina</button>
+                    </div>
+                </div>`;
+        }
 
-        const lunchBreakBtn = (entry.lunchBreakMinutes == null)
+        const lunchBreakBtn = !hasLunchBreak
             ? `<button class="btn-add-lunch" onclick="addLunchBreak('${entry.id}')">Pausa Pranzo</button>`
             : '';
         
@@ -457,7 +559,7 @@ function renderEntries() {
                         <span class="entry-value">${formattedWorked}</span>
                     </div>
                 ` : ''}
-                ${lunchBreakRow}
+                ${lunchBreakSection}
                 <div class="entry-actions">
                     ${lunchBreakBtn}
                     <button class="btn-edit" onclick="editEntry('${entry.id}')">Modifica</button>
@@ -496,9 +598,17 @@ window.editLunchBreak = function(id) {
     if (entry) openLunchBreakModal(entry);
 };
 
+window.addLunchBreakActualEnd = function(id) {
+    const entry = workEntries.find(e => e.id === id);
+    if (entry) openLunchBreakModal(entry, true);
+};
+
 window.deleteLunchBreak = function(id) {
     const index = workEntries.findIndex(e => e.id === id);
     if (index !== -1) {
+        workEntries[index].lunchBreakStart = null;
+        workEntries[index].lunchBreakExpectedEnd = null;
+        workEntries[index].lunchBreakActualEnd = null;
         workEntries[index].lunchBreakMinutes = null;
         saveLocalEntries();
         renderEntries();
@@ -585,10 +695,10 @@ async function syncToGoogleSheets(entry, action) {
         const clockOut = entry.clockOutTime ? new Date(entry.clockOutTime) : null;
         const hours = clockOut ? calculateHoursWorked(clockIn, clockOut) : '';
 
-        const lunchMins = entry.lunchBreakMinutes != null ? entry.lunchBreakMinutes : 0;
-        const lunchBreakFormatted = entry.lunchBreakMinutes != null
-            ? formatMinutesToHoursAndMinutes(entry.lunchBreakMinutes)
-            : '';
+        const lunchStartSync = entry.lunchBreakStart ? new Date(entry.lunchBreakStart) : null;
+        const lunchExpectedEndSync = entry.lunchBreakExpectedEnd ? new Date(entry.lunchBreakExpectedEnd) : null;
+        const lunchActualEndSync = entry.lunchBreakActualEnd ? new Date(entry.lunchBreakActualEnd) : null;
+        const lunchMins = getLunchBreakMinutes(entry);
 
         const payload = {
             action: action || 'append',
@@ -597,7 +707,10 @@ async function syncToGoogleSheets(entry, action) {
             expectedClockOut: formatDate(expected),
             clockOut: clockOut ? formatDate(clockOut) : '',
             hours: hours ? hours.toFixed(2) : '',
-            lunchBreak: lunchBreakFormatted,
+            lunchBreakStart: lunchStartSync ? formatDate(lunchStartSync) : '',
+            lunchBreakExpectedEnd: lunchExpectedEndSync ? formatDate(lunchExpectedEndSync) : '',
+            lunchBreakActualEnd: lunchActualEndSync ? formatDate(lunchActualEndSync) : '',
+            lunchBreakDuration: lunchMins > 0 ? formatMinutesToHoursAndMinutes(lunchMins) : '',
             id: entry.id
         };
 
