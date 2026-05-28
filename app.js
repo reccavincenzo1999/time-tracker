@@ -693,12 +693,20 @@ async function syncToGoogleSheets(entry, action) {
         const clockIn = new Date(entry.clockInTime);
         const expected = new Date(entry.expectedClockOutTime);
         const clockOut = entry.clockOutTime ? new Date(entry.clockOutTime) : null;
-        const hours = clockOut ? calculateHoursWorked(clockIn, clockOut) : '';
 
         const lunchStartSync = entry.lunchBreakStart ? new Date(entry.lunchBreakStart) : null;
         const lunchExpectedEndSync = entry.lunchBreakExpectedEnd ? new Date(entry.lunchBreakExpectedEnd) : null;
         const lunchActualEndSync = entry.lunchBreakActualEnd ? new Date(entry.lunchBreakActualEnd) : null;
         const lunchMins = getLunchBreakMinutes(entry);
+
+        // Ore lavorate effettive (con deduzione eccedenza pausa > 30 min), formato h min
+        let hoursFormatted = '';
+        if (clockOut) {
+            const rawMinutes = Math.max(0, Math.round((clockOut - clockIn) / (1000 * 60)));
+            const excessMins = lunchMins > 30 ? lunchMins - 30 : 0;
+            const effectiveMinutes = Math.max(0, rawMinutes - excessMins);
+            hoursFormatted = formatMinutesToHoursAndMinutes(effectiveMinutes);
+        }
 
         const payload = {
             action: action || 'append',
@@ -706,7 +714,7 @@ async function syncToGoogleSheets(entry, action) {
             clockIn: formatDate(clockIn),
             expectedClockOut: formatDate(expected),
             clockOut: clockOut ? formatDate(clockOut) : '',
-            hours: hours ? hours.toFixed(2) : '',
+            hours: hoursFormatted,
             lunchBreakStart: lunchStartSync ? formatDate(lunchStartSync) : '',
             lunchBreakExpectedEnd: lunchExpectedEndSync ? formatDate(lunchExpectedEndSync) : '',
             lunchBreakActualEnd: lunchActualEndSync ? formatDate(lunchActualEndSync) : '',
