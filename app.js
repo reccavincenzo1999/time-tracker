@@ -605,7 +605,7 @@ async function syncToGoogleSheets(entry, action) {
             await postToAppsScript(payload);
         } catch (error) {
             const message = String(error && error.message ? error.message : error);
-            if (message.toLowerCase().includes('load failed')) {
+            if (message.toLowerCase().includes('load failed') || message.toLowerCase().includes('failed to fetch')) {
                 await postToAppsScriptNoCors(payload);
             } else {
                 throw error;
