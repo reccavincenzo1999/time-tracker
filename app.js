@@ -3,7 +3,7 @@ const CONFIG = {
     apiKey: 'AIzaSyAzOowlr95IQNwC3RSEH6nZH5fZObgRD_E',
     spreadsheetId: '1DAgMwHbxGp-8OMtCrk6JlB6MFSdjzxlL05oW2wV-a50',
     sheetName: 'TimeTracking',
-    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxm22ZKE7_b39eEVwpxPtoqwsjbBTt-Fg-teU9dfM56_pQG7GbYWqy9TzgNyVVwCZO3Fw/exec'
+    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzWJ41h6zxfLUsKSY5GF9lOgaxUKCSc4MxQgqFAqzN6F4gdLJL6Rx_PSVJdudmWEAWRoQ/exec'
 };
 
 // State Management
