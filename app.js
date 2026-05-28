@@ -419,7 +419,6 @@ function renderEntries() {
             formattedWorked = formatMinutesToHoursAndMinutes(effectiveMinutes);
         }
 
-        // Lunch break row
         const lunchBreakRow = (entry.lunchBreakMinutes != null)
             ? `<div class="entry-row">
                 <span class="entry-label">Pausa pranzo:</span>
@@ -429,10 +428,11 @@ function renderEntries() {
                     <button class="btn-delete-small" onclick="deleteLunchBreak('${entry.id}')">Elimina</button>
                 </div>
             </div>`
-            : `<div class="entry-row">
-                <span class="entry-label">Pausa pranzo:</span>
-                <button class="btn-add-lunch" onclick="addLunchBreak('${entry.id}')">Aggiungi</button>
-            </div>`;
+            : '';
+
+        const lunchBreakBtn = (entry.lunchBreakMinutes == null)
+            ? `<button class="btn-add-lunch" onclick="addLunchBreak('${entry.id}')">Pausa Pranzo</button>`
+            : '';
         
         return `
             <div class="entry-card">
@@ -459,6 +459,7 @@ function renderEntries() {
                 ` : ''}
                 ${lunchBreakRow}
                 <div class="entry-actions">
+                    ${lunchBreakBtn}
                     <button class="btn-edit" onclick="editEntry('${entry.id}')">Modifica</button>
                     <button class="btn-delete" onclick="deleteEntry('${entry.id}')">Elimina</button>
                 </div>
