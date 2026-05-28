@@ -531,22 +531,6 @@ body {
 }
 
 .btn-edit-small {
-    background: #D500F9;
-    color: white;
-    border: none;
-    padding: 0.25rem 0.6rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn-edit-small:active {
-    background: #aa00cc;
-}
-
-.btn-delete-small {
     background: #00BCD4;
     color: white;
     border: none;
@@ -558,8 +542,24 @@ body {
     transition: background-color 0.2s;
 }
 
-.btn-delete-small:active {
+.btn-edit-small:active {
     background: #0097a7;
+}
+
+.btn-delete-small {
+    background: #D500F9;
+    color: white;
+    border: none;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-delete-small:active {
+    background: #aa00cc;
 }
 
 .lunch-break-duration-row {
