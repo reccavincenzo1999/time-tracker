@@ -409,14 +409,13 @@ function renderEntries() {
         const expected = new Date(entry.expectedClockOutTime);
         const clockOut = entry.clockOutTime ? new Date(entry.clockOutTime) : null;
 
-        // Calculate effective worked minutes with lunch break deduction (only if > 30 min)
+        // Calculate effective worked minutes: subtract only the excess over 30 min
         let formattedWorked = null;
         if (clockOut) {
             const rawMinutes = Math.max(0, Math.round((clockOut - clockIn) / (1000 * 60)));
             const lunchMins = entry.lunchBreakMinutes != null ? entry.lunchBreakMinutes : 0;
-            const effectiveMinutes = (lunchMins > 30)
-                ? Math.max(0, rawMinutes - lunchMins)
-                : rawMinutes;
+            const excessMins = lunchMins > 30 ? lunchMins - 30 : 0;
+            const effectiveMinutes = Math.max(0, rawMinutes - excessMins);
             formattedWorked = formatMinutesToHoursAndMinutes(effectiveMinutes);
         }
 

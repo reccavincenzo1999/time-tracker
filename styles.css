@@ -531,7 +531,7 @@ body {
 }
 
 .btn-edit-small {
-    background: var(--warning-color);
+    background: #D500F9;
     color: white;
     border: none;
     padding: 0.25rem 0.6rem;
@@ -543,11 +543,11 @@ body {
 }
 
 .btn-edit-small:active {
-    background: #e07f00;
+    background: #aa00cc;
 }
 
 .btn-delete-small {
-    background: var(--danger-color);
+    background: #00BCD4;
     color: white;
     border: none;
     padding: 0.25rem 0.6rem;
@@ -559,7 +559,7 @@ body {
 }
 
 .btn-delete-small:active {
-    background: #d93025;
+    background: #0097a7;
 }
 
 .lunch-break-duration-row {
