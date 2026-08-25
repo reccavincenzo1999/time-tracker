@@ -602,9 +602,6 @@ function renderEntries() {
         return;
     }
 
-    // Ordina gli elementi dal più recente (in alto) al più vecchio (in basso)
-    workEntries.sort((a, b) => new Date(b.clockInTime) - new Date(a.clockInTime));
-
     // 1. Group by Year and Week
     const grouped = {};
     workEntries.forEach(entry => {
@@ -622,6 +619,9 @@ function renderEntries() {
     elements.entriesList.innerHTML = Object.keys(grouped).map(key => {
         const group = grouped[key];
         
+        // Ordina gli ingressi della settimana dal più recente (in alto) al più vecchio (in basso)
+        group.entries.sort((a, b) => new Date(b.clockInTime) - new Date(a.clockInTime));
+
         const cardsHTML = group.entries.map(entry => {
             const clockIn = new Date(entry.clockInTime);
             const expected = new Date(entry.expectedClockOutTime);
