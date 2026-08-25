@@ -5,6 +5,7 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 :root {
@@ -16,7 +17,7 @@
     --danger-color: #ef4444;        /* Rosso vivido */
     --warning-color: #f59e0b;       /* Arancio/Ambra acceso */
     
-    /* Sfondo crema/giallo più caldo e luminoso */
+    /* Sfondo crema/giallo caldo e luminoso */
     --background: linear-gradient(135deg, #fffef5 0%, #fff6b3 100%);
     --card-background: rgba(255, 255, 255, 0.92);
     
@@ -41,7 +42,6 @@ html {
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--background);
     background-attachment: fixed;
     color: var(--text-primary);
@@ -304,6 +304,29 @@ body {
     transform: scale(0.93);
 }
 
+/* Pulsante Pausa Pranzo Principale */
+.btn-add-lunch {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: white;
+    border: none;
+    padding: 0.55rem 1.1rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.btn-add-lunch:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+}
+
+.btn-add-lunch:active {
+    transform: scale(0.95);
+}
+
 /* Modale */
 .modal {
     position: fixed;
@@ -409,7 +432,6 @@ body {
     color: var(--text-primary);
     outline: none;
     transition: var(--transition);
-    font-family: inherit;
 }
 
 .form-group input[type="date"]:focus,
@@ -460,7 +482,7 @@ body {
     font-weight: 800;
 }
 
-/* Pulsanti Form */
+/* Pulsanti Form General */
 .btn {
     padding: 0.85rem 1.25rem;
     border: none;
@@ -536,6 +558,16 @@ body {
     font-weight: 700;
 }
 
+/* Azioni e Pulsanti della Pausa Pranzo */
+.lunch-break-table-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid #bae6fd;
+}
+
 .btn-add-lunch-actual, .btn-edit-small, .btn-delete-small {
     border: none;
     padding: 0.35rem 0.75rem;
@@ -551,14 +583,34 @@ body {
     color: white;
 }
 
+.btn-add-lunch-actual:hover {
+    background: #0369a1;
+}
+
 .btn-edit-small {
     background: #fef3c7;
     color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.btn-edit-small:hover {
+    background: #fde68a;
+    color: #92400e;
 }
 
 .btn-delete-small {
     background: #fee2e2;
     color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+.btn-delete-small:hover {
+    background: #fca5a5;
+    color: #b91c1c;
+}
+
+.btn-add-lunch-actual:active, .btn-edit-small:active, .btn-delete-small:active {
+    transform: scale(0.93);
 }
 
 .lunch-break-note {
