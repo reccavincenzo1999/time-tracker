@@ -663,8 +663,16 @@ function renderEntries() {
         grouped[key].entries.push(entry);
     });
 
-    // 2. Build HTML
-    elements.entriesList.innerHTML = Object.keys(grouped).map(key => {
+    // 2. Ordina le settimane in ordine decrescente (dalla più recente in alto alla più remota in basso)
+    const sortedWeekKeys = Object.keys(grouped).sort((a, b) => {
+        if (grouped[b].year !== grouped[a].year) {
+            return grouped[b].year - grouped[a].year;
+        }
+        return grouped[b].week - grouped[a].week;
+    });
+
+    // 3. Build HTML
+    elements.entriesList.innerHTML = sortedWeekKeys.map(key => {
         const group = grouped[key];
         
         // Ordina gli ingressi della settimana dal più recente (in alto) al più vecchio (in basso)
