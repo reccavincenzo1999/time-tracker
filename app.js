@@ -169,17 +169,6 @@ function buildExpectedClockOut(clockIn, expectedTimeStr) {
     return expected;
 }
 
-function calculateHoursWorked(clockIn, clockOut) {
-    return (clockOut - clockIn) / (1000 * 60 * 60);
-}
-
-function formatHoursAndMinutes(clockIn, clockOut) {
-    const totalMinutes = Math.max(0, Math.round((clockOut - clockIn) / (1000 * 60)));
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${hours} h ${minutes} min`;
-}
-
 function formatMinutesToHoursAndMinutes(totalMinutes) {
     const h = Math.floor(totalMinutes / 60);
     const m = totalMinutes % 60;
@@ -525,10 +514,16 @@ function generateId() {
     });
 }
 
-// Global functions for click handlers
+// Global function per la compressione della card
 window.toggleCard = function(headerElement) {
     const card = headerElement.closest('.entry-card');
     card.classList.toggle('collapsed');
+};
+
+// Global function per comprimere/espandere l'intera settimana
+window.toggleWeekGroup = function(headerElement) {
+    const group = headerElement.closest('.week-group');
+    group.classList.toggle('collapsed');
 };
 
 window.editClockOut = function(id) {
@@ -656,7 +651,7 @@ function renderEntries() {
             return `
                 <div class="entry-card">
                     <div class="entry-card-header" onclick="toggleCard(this)">
-                        <div class="entry-header-title">
+                        <div class="entry-header-left">
                             <span class="entry-label">Entrata:</span>
                             <strong class="entry-value">${formatDate(clockIn)}</strong>
                         </div>
@@ -696,11 +691,14 @@ function renderEntries() {
 
         return `
             <section class="week-group">
-                <div class="week-header">
-                    <span class="week-title">Settimana ${group.week} (${group.year})</span>
-                    <span class="week-count">${group.entries.length} ingressi</span>
+                <div class="week-header" onclick="toggleWeekGroup(this)">
+                    <div>
+                        <span class="week-title">Settimana ${group.week} (${group.year})</span>
+                        <span class="week-count">${group.entries.length} ingressi</span>
+                    </div>
+                    <span class="week-toggle-icon">▼</span>
                 </div>
-                <div class="week-entries">
+                <div class="week-content">
                     ${cardsHTML}
                 </div>
             </section>
@@ -744,9 +742,7 @@ async function postToAppsScript(payload) {
             if (errorData && errorData.error && errorData.error.message) {
                 errorDetails = `Errore API ${response.status}: ${errorData.error.message}`;
             }
-        } catch (parseError) {
-            // Keep default errorDetails when response is not JSON.
-        }
+        } catch (parseError) {}
         throw new Error(errorDetails);
     }
 
@@ -832,70 +828,6 @@ async function syncToGoogleSheets(entry, action) {
     } finally {
         hideLoading();
     }
-}
-
-async function loadEntriesFromGoogleSheets() {
-    if (CONFIG.apiKey === 'YOUR_API_KEY_HERE' || CONFIG.spreadsheetId === 'YOUR_SPREADSHEET_ID_HERE') {
-        showError('Configura prima Google Sheets in app.js');
-        return;
-    }
-    
-    showLoading();
-    hideError();
-    
-    try {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${CONFIG.sheetName}!A:E?key=${CONFIG.apiKey}`;
-        
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            let errorDetails = `Errore API: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                if (errorData && errorData.error && errorData.error.message) {
-                    errorDetails = `Errore API ${response.status}: ${errorData.error.message}`;
-                }
-            } catch (parseError) {
-                // Keep default errorDetails when response is not JSON.
-            }
-            throw new Error(errorDetails);
-        }
-        
-        const data = await response.json();
-        
-        if (data.values && data.values.length > 1) {
-            const entries = data.values.slice(1).map(row => {
-                if (row.length < 5) return null;
-                
-                const [clockInStr, expectedStr, clockOutStr, , id] = row;
-                
-                return {
-                    id: id,
-                    clockInTime: parseDateString(clockInStr),
-                    expectedClockOutTime: parseDateString(expectedStr),
-                    clockOutTime: clockOutStr ? parseDateString(clockOutStr) : null
-                };
-            }).filter(e => e !== null);
-            
-            workEntries = entries;
-            saveLocalEntries();
-            renderEntries();
-        }
-        
-        console.log('Caricato da Google Sheets');
-    } catch (error) {
-        console.error('Errore caricamento:', error);
-        showError(`Errore caricamento: ${error.message}`);
-    } finally {
-        hideLoading();
-    }
-}
-
-function parseDateString(str) {
-    const [datePart, timePart] = str.split(' ');
-    const [day, month, year] = datePart.split('/');
-    const [hours, minutes] = timePart.split(':');
-    return new Date(year, month - 1, day, hours, minutes).toISOString();
 }
 
 // Start App
