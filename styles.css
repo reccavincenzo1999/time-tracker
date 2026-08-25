@@ -601,26 +601,28 @@ body {
     background: #0369a1;
 }
 
+/* Modifica Pausa Pranzo: Turchese / Teal */
 .btn-edit-small {
-    background: #fef3c7;
-    color: #b45309;
-    border: 1px solid #fde68a;
+    background: #ccfbf1;
+    color: #0f766e;
+    border: 1px solid #99f6e4;
 }
 
 .btn-edit-small:hover {
-    background: #fde68a;
-    color: #92400e;
+    background: #99f6e4;
+    color: #115e59;
 }
 
+/* Elimina Pausa Pranzo: Viola / Prugna */
 .btn-delete-small {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fca5a5;
+    background: #f3e8ff;
+    color: #7e22ce;
+    border: 1px solid #e9d5ff;
 }
 
 .btn-delete-small:hover {
-    background: #fca5a5;
-    color: #b91c1c;
+    background: #e9d5ff;
+    color: #6b21a8;
 }
 
 .btn-add-lunch-actual:active, .btn-edit-small:active, .btn-delete-small:active {
