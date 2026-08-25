@@ -9,13 +9,17 @@
 }
 
 :root {
-    /* Palette originale ottimizzata e più accesa */
+    /* Palette principale ottimizzata e più accesa */
     --primary-color: #004fb3;       /* Blu più vivo e brillante */
     --primary-dark: #003275;        /* Blu scuro per hover/active */
     --secondary-color: #ffffff;
     --success-color: #10b981;       /* Verde brillante */
     --danger-color: #ef4444;        /* Rosso vivido */
     --warning-color: #f59e0b;       /* Arancio/Ambra acceso */
+    
+    /* Nuovi colori dedicati alla Pausa Pranzo */
+    --lunch-expected-color: #8b5cf6; /* Indaco / Viola brillante */
+    --lunch-actual-color: #d946ef;   /* Magenta / Fuchsia acceso */
     
     /* Sfondo crema/giallo caldo e luminoso */
     --background: linear-gradient(135deg, #fffef5 0%, #fff6b3 100%);
@@ -556,6 +560,16 @@ body {
 
 .lunch-value {
     font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Colori specifici per Fine Prevista ed Effettiva della Pausa Pranzo */
+.lunch-value.primary {
+    color: var(--lunch-expected-color) !important; /* Indaco / Viola brillante */
+}
+
+.lunch-value.success {
+    color: var(--lunch-actual-color) !important;   /* Magenta / Fuchsia acceso */
 }
 
 /* Azioni e Pulsanti della Pausa Pranzo */
