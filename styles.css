@@ -39,7 +39,9 @@
     --radius-md: 16px;
     --radius-lg: 24px;
     
-    --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Transition ultra-fluida ottimizzata per display 120Hz */
+    --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html {
@@ -79,6 +81,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    transform: translateZ(0); /* Hardware Acceleration 120Hz */
 }
 
 .header-brand {
@@ -111,27 +114,30 @@ body {
     letter-spacing: -0.01em;
 }
 
+/* Pulsante Piu' e Stile Icone Circolari */
 .btn-icon {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     color: var(--secondary-color);
     cursor: pointer;
-    padding: 0.7rem;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: var(--transition);
-    will-change: transform;
+    transition: var(--transition-fast);
+    will-change: transform, background-color;
+    transform: translateZ(0);
 }
 
 .btn-icon:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.08) rotate(5deg);
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.08) translateZ(0);
 }
 
 .btn-icon:active {
-    transform: scale(0.92);
+    transform: scale(0.92) translateZ(0);
 }
 
 /* Loading Spinner */
@@ -231,6 +237,8 @@ body {
     overflow: hidden;
     margin-bottom: 1.25rem;
     transition: var(--transition);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
 .week-header {
@@ -241,7 +249,7 @@ body {
     align-items: center;
     cursor: pointer;
     user-select: none;
-    transition: background 0.2s ease;
+    transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .week-header:hover {
@@ -262,48 +270,73 @@ body {
     font-weight: 600;
 }
 
-/* Pulsante Cestino Settimana */
+/* Pulsante Cestino Settimana (Stile Cerchio Rosso Coerente) */
 .btn-delete-week {
-    background: transparent;
-    border: none;
-    color: var(--danger-color);
+    background: rgba(220, 38, 38, 0.12) !important;
+    border: 1px solid rgba(220, 38, 38, 0.25) !important;
+    color: var(--danger-color) !important;
     cursor: pointer;
-    font-size: 1.1rem;
-    padding: 4px 8px;
-    border-radius: var(--radius-sm);
-    transition: var(--transition);
+    width: 36px;
+    height: 36px;
+    border-radius: 50% !important;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1rem !important;
+    padding: 0 !important;
+    transition: var(--transition-fast) !important;
+    will-change: transform, background-color;
+    transform: translateZ(0);
 }
 
 .btn-delete-week:hover {
-    background-color: rgba(220, 38, 38, 0.12);
-    transform: scale(1.1);
+    background: var(--danger-color) !important;
+    color: #ffffff !important;
+    transform: scale(1.08) translateZ(0);
 }
 
 .btn-delete-week:active {
-    transform: scale(0.95);
+    transform: scale(0.92) translateZ(0);
 }
 
+/* Icona Freccia Settimana (Stile Cerchio Glass come il Più) */
 .week-toggle-icon {
-    font-size: 0.8rem;
-    color: var(--primary-light);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 66, 140, 0.08);
+    border: 1px solid rgba(0, 66, 140, 0.15);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: var(--transition);
+    will-change: transform, background-color;
+    transform: translateZ(0);
+}
+
+.week-header:hover .week-toggle-icon {
+    background: rgba(0, 66, 140, 0.15);
 }
 
 .week-group.collapsed .week-toggle-icon {
-    transform: rotate(-90deg);
+    transform: rotate(-90deg) translateZ(0);
 }
 
+/* Animazione Contenuto Settimana (120Hz Ultra Smooth) */
 .week-content {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     padding: 1.2rem;
-    max-height: 2500px;
+    max-height: 3000px;
     opacity: 1;
-    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.3s ease;
+    transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                padding 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: max-height, opacity, padding;
+    transform: translateZ(0);
 }
 
 .week-group.collapsed .week-content {
@@ -325,9 +358,11 @@ body {
     border: 1px solid var(--card-border);
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
-/* Header della Card: Entrata a Sinistra, Freccina a Destra */
+/* Header della Card */
 .entry-card-header {
     display: flex;
     justify-content: space-between;
@@ -342,21 +377,33 @@ body {
     gap: 0.5rem;
 }
 
+/* Pulsante Freccia Singola Day Card (Stile Cerchio Glass) */
 .btn-toggle-card {
-    background: transparent;
-    border: none;
-    color: var(--primary-light);
+    background: rgba(0, 66, 140, 0.08);
+    border: 1px solid rgba(0, 66, 140, 0.15);
+    color: var(--primary-color);
     cursor: pointer;
-    padding: 0.2rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: var(--transition-fast);
+    will-change: transform, background-color;
+    transform: translateZ(0);
+}
+
+.btn-toggle-card:hover {
+    background: rgba(0, 66, 140, 0.18);
 }
 
 .chevron {
     display: inline-block;
-    font-size: 0.8rem;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.7rem;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 /* Comprimi ed Espandi Card Singola */
@@ -365,7 +412,7 @@ body {
 }
 
 .entry-card.collapsed .chevron {
-    transform: rotate(-90deg);
+    transform: rotate(-90deg) translateZ(0);
 }
 
 /* Card Body e Righe */
@@ -409,12 +456,18 @@ body {
     font-size: 0.875rem;
     font-weight: 700;
     cursor: pointer;
-    transition: var(--transition);
+    transition: var(--transition-fast);
     box-shadow: 0 4px 14px rgba(0, 66, 140, 0.25);
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .btn-add-clockout:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px) translateZ(0);
+}
+
+.btn-add-clockout:active {
+    transform: scale(0.96) translateZ(0);
 }
 
 .entry-actions {
@@ -433,7 +486,9 @@ body {
     font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
-    transition: var(--transition);
+    transition: var(--transition-fast);
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .btn-edit {
@@ -442,7 +497,8 @@ body {
     border: 1px solid #fde68a;
 }
 
-.btn-edit:hover { background: #fde68a; }
+.btn-edit:hover { background: #fde68a; transform: translateY(-1px) translateZ(0); }
+.btn-edit:active { transform: scale(0.95) translateZ(0); }
 
 .btn-delete {
     background: #fee2e2;
@@ -450,7 +506,8 @@ body {
     border: 1px solid #fca5a5;
 }
 
-.btn-delete:hover { background: #fca5a5; }
+.btn-delete:hover { background: #fca5a5; transform: translateY(-1px) translateZ(0); }
+.btn-delete:active { transform: scale(0.95) translateZ(0); }
 
 .btn-add-lunch {
     background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
@@ -461,7 +518,17 @@ body {
     font-size: 0.875rem;
     font-weight: 700;
     cursor: pointer;
-    transition: var(--transition);
+    transition: var(--transition-fast);
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+.btn-add-lunch:hover {
+    transform: translateY(-1px) translateZ(0);
+}
+
+.btn-add-lunch:active {
+    transform: scale(0.96) translateZ(0);
 }
 
 /* Modals */
@@ -474,6 +541,7 @@ body {
     display: flex;
     align-items: flex-end;
     z-index: 1000;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-content {
@@ -485,6 +553,7 @@ body {
     max-height: 88vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
+    transform: translateZ(0);
 }
 
 .modal-header {
@@ -510,6 +579,11 @@ body {
     width: 36px; height: 36px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.btn-close:hover {
+    background: #e2e8f0;
 }
 
 .modal-body { padding: 1.75rem; }
@@ -544,6 +618,12 @@ body {
     background: #f8fafc;
     color: var(--text-primary);
     outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input[type="date"]:focus,
+.form-group input[type="time"]:focus {
+    border-color: var(--primary-light);
 }
 
 .checkbox-label {
@@ -593,6 +673,7 @@ body {
     font-weight: 700;
     cursor: pointer;
     flex: 1;
+    transition: var(--transition-fast);
 }
 
 .btn-primary {
@@ -600,10 +681,18 @@ body {
     color: white;
 }
 
+.btn-primary:active {
+    transform: scale(0.97);
+}
+
 .btn-secondary {
     background: #f1f5f9;
     color: var(--text-primary);
     border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:active {
+    transform: scale(0.97);
 }
 
 /* Lunch Break Table */
@@ -666,6 +755,7 @@ body {
     font-size: 0.775rem;
     font-weight: 700;
     cursor: pointer;
+    transition: var(--transition-fast);
 }
 
 .btn-add-lunch-actual { background: #0284c7; color: white; }
