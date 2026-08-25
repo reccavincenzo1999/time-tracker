@@ -270,7 +270,7 @@ body {
     font-weight: 600;
 }
 
-/* Pulsante Elimina Settimana (Cerchio Rosso con Icona X Morbida) */
+/* Pulsante Elimina Settimana (Cerchio Rosso Glass con Simbolo X) */
 .btn-delete-week {
     background: rgba(220, 38, 38, 0.12) !important;
     border: 1px solid rgba(220, 38, 38, 0.25) !important;
@@ -288,6 +288,20 @@ body {
     transition: var(--transition-btn) !important;
     will-change: transform, background-color, color;
     transform: translateZ(0);
+}
+
+/* Nasconde eventuale icona FontAwesome o HTML interna */
+.btn-delete-week i, 
+.btn-delete-week svg {
+    display: none !important;
+}
+
+/* Inserisce l'icona ✕ pulita via CSS */
+.btn-delete-week::after {
+    content: "✕";
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1;
 }
 
 .btn-delete-week:hover {
