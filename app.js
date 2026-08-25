@@ -529,6 +529,38 @@ function deleteEntryById(id) {
     syncToGoogleSheets(entryToDelete, 'delete');
 }
 
+function deleteWeekGroup(weekKey) {
+    const entriesToDelete = workEntries.filter(entry => {
+        const date = new Date(entry.clockInTime);
+        const year = date.getFullYear();
+        const week = getWeekNumber(date);
+        return `${year}-W${week}` === weekKey;
+    });
+
+    if (entriesToDelete.length === 0) return;
+
+    const confirmDelete = window.confirm(
+        `Eliminare tutti i ${entriesToDelete.length} ingressi della settimana (${weekKey})? Verranno rimossi anche dal foglio Google.`
+    );
+    if (!confirmDelete) return;
+
+    // Filtra mantenendo solo gli ingressi delle altre settimane
+    workEntries = workEntries.filter(entry => {
+        const date = new Date(entry.clockInTime);
+        const year = date.getFullYear();
+        const week = getWeekNumber(date);
+        return `${year}-W${week}` !== weekKey;
+    });
+
+    saveLocalEntries();
+    renderEntries();
+
+    // Sincronizza ciascuna eliminazione con Google Sheets
+    entriesToDelete.forEach(entry => {
+        syncToGoogleSheets(entry, 'delete');
+    });
+}
+
 function generateId() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -560,6 +592,10 @@ window.editClockOut = function(id) {
 
 window.deleteEntry = function(id) {
     deleteEntryById(id);
+};
+
+window.deleteWeek = function(weekKey) {
+    deleteWeekGroup(weekKey);
 };
 
 window.editEntry = function(id) {
@@ -597,6 +633,18 @@ window.deleteLunchBreak = function(id) {
 
 // Rendering
 function renderEntries() {
+    // 0. Salva lo stato espanso/compresso di gruppi e card per non perdere lo stato durante la riscrittura dell'HTML
+    const collapsedWeeks = new Set();
+    const collapsedCards = new Set();
+    document.querySelectorAll('.week-group.collapsed').forEach(el => {
+        const key = el.getAttribute('data-week-key');
+        if (key) collapsedWeeks.add(key);
+    });
+    document.querySelectorAll('.entry-card.collapsed').forEach(el => {
+        const id = el.getAttribute('data-entry-id');
+        if (id) collapsedCards.add(id);
+    });
+
     if (workEntries.length === 0) {
         elements.entriesList.innerHTML = '<p class="empty-state">Nessun ingresso registrato</p>';
         return;
@@ -622,10 +670,13 @@ function renderEntries() {
         // Ordina gli ingressi della settimana dal più recente (in alto) al più vecchio (in basso)
         group.entries.sort((a, b) => new Date(b.clockInTime) - new Date(a.clockInTime));
 
+        const isWeekCollapsed = collapsedWeeks.has(key);
+
         const cardsHTML = group.entries.map(entry => {
             const clockIn = new Date(entry.clockInTime);
             const expected = new Date(entry.expectedClockOutTime);
             const clockOut = entry.clockOutTime ? new Date(entry.clockOutTime) : null;
+            const isCardCollapsed = collapsedCards.has(String(entry.id));
 
             let formattedWorked = null;
             if (clockOut) {
@@ -679,7 +730,7 @@ function renderEntries() {
                 : '';
 
             return `
-                <div class="entry-card">
+                <div class="entry-card ${isCardCollapsed ? 'collapsed' : ''}" data-entry-id="${entry.id}">
                     <div class="entry-card-header" onclick="toggleCard(this)">
                         <div class="entry-header-left">
                             <span class="entry-label">Entrata:</span>
@@ -720,13 +771,16 @@ function renderEntries() {
         }).join('');
 
         return `
-            <section class="week-group">
+            <section class="week-group ${isWeekCollapsed ? 'collapsed' : ''}" data-week-key="${key}">
                 <div class="week-header" onclick="toggleWeekGroup(this)">
                     <div>
                         <span class="week-title">Settimana ${group.week} (${group.year})</span>
                         <span class="week-count">${group.entries.length} ingressi</span>
                     </div>
-                    <span class="week-toggle-icon">▼</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button type="button" class="btn-delete-week" title="Elimina intera settimana" onclick="event.stopPropagation(); deleteWeek('${key}')" style="background:none; border:none; color:#dc3545; cursor:pointer; font-size:1.1rem; padding:2px 6px;">🗑️</button>
+                        <span class="week-toggle-icon">▼</span>
+                    </div>
                 </div>
                 <div class="week-content">
                     ${cardsHTML}
