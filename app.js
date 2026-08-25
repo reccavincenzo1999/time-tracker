@@ -568,7 +568,7 @@ window.deleteLunchBreak = function(id) {
     }
 };
 
-// Rendering
+// Rendering aggiornato con blocco della propagazione degli eventi (stopPropagation)
 function renderEntries() {
     if (workEntries.length === 0) {
         elements.entriesList.innerHTML = '<p class="empty-state">Nessun ingresso registrato</p>';
@@ -630,7 +630,7 @@ function renderEntries() {
                             <span class="lunch-label">Fine Effettiva:</span>
                             ${lunchActualEnd
                                 ? `<span class="lunch-value success">${formatDate(lunchActualEnd)}</span>`
-                                : `<button class="btn-add-lunch-actual" onclick="addLunchBreakActualEnd('${entry.id}')">Aggiungi</button>`
+                                : `<button class="btn-add-lunch-actual" onclick="event.stopPropagation(); addLunchBreakActualEnd('${entry.id}')">Aggiungi</button>`
                             }
                         </div>
                         <div class="lunch-break-table-row">
@@ -638,14 +638,14 @@ function renderEntries() {
                             <span class="lunch-value">${durationStr}</span>
                         </div>
                         <div class="lunch-break-table-actions">
-                            <button class="btn-edit-small" onclick="editLunchBreak('${entry.id}')">Modifica</button>
-                            <button class="btn-delete-small" onclick="deleteLunchBreak('${entry.id}')">Elimina</button>
+                            <button class="btn-edit-small" onclick="event.stopPropagation(); editLunchBreak('${entry.id}')">Modifica</button>
+                            <button class="btn-delete-small" onclick="event.stopPropagation(); deleteLunchBreak('${entry.id}')">Elimina</button>
                         </div>
                     </div>`;
             }
 
             const lunchBreakBtn = !hasLunchBreak
-                ? `<button class="btn-add-lunch" onclick="addLunchBreak('${entry.id}')">Pausa Pranzo</button>`
+                ? `<button class="btn-add-lunch" onclick="event.stopPropagation(); addLunchBreak('${entry.id}')">Pausa Pranzo</button>`
                 : '';
 
             return `
@@ -655,7 +655,7 @@ function renderEntries() {
                             <span class="entry-label">Entrata:</span>
                             <strong class="entry-value">${formatDate(clockIn)}</strong>
                         </div>
-                        <button type="button" class="btn-toggle-card" aria-label="Comprimi o espandi">
+                        <button type="button" class="btn-toggle-card" aria-label="Comprimi o espandi" onclick="event.stopPropagation(); toggleCard(this.parentElement)">
                             <span class="chevron">▼</span>
                         </button>
                     </div>
@@ -669,7 +669,7 @@ function renderEntries() {
                             <span class="entry-label">Uscita Effettiva:</span>
                             ${clockOut 
                                 ? `<span class="entry-value success">${formatDate(clockOut)}</span>`
-                                : `<button class="btn-add-clockout" onclick="editClockOut('${entry.id}')">Aggiungi</button>`
+                                : `<button class="btn-add-clockout" onclick="event.stopPropagation(); editClockOut('${entry.id}')">Aggiungi</button>`
                             }
                         </div>
                         ${formattedWorked !== null ? `
@@ -681,8 +681,8 @@ function renderEntries() {
                         ${lunchBreakSection}
                         <div class="entry-actions">
                             ${lunchBreakBtn}
-                            <button class="btn-edit" onclick="editEntry('${entry.id}')">Modifica</button>
-                            <button class="btn-delete" onclick="deleteEntry('${entry.id}')">Elimina</button>
+                            <button class="btn-edit" onclick="event.stopPropagation(); editEntry('${entry.id}')">Modifica</button>
+                            <button class="btn-delete" onclick="event.stopPropagation(); deleteEntry('${entry.id}')">Elimina</button>
                         </div>
                     </div>
                 </div>
