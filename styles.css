@@ -270,48 +270,60 @@ body {
     font-weight: 600;
 }
 
-/* Pulsante Elimina Settimana (Cerchio Rosso Glass con Simbolo X) */
+/* ==========================================================================
+   Pulsante Elimina Settimana - Icona Cestino Personalizzata (cestino.png)
+   ========================================================================== */
 .btn-delete-week {
-    background: rgba(220, 38, 38, 0.12) !important;
-    border: 1px solid rgba(220, 38, 38, 0.25) !important;
-    color: var(--danger-color) !important;
+    position: relative !important;
+    background: transparent !important;
+    border: none !important;
     cursor: pointer;
-    width: 36px;
-    height: 36px;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 50% !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.95rem !important;
-    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     padding: 0 !important;
-    transition: var(--transition-btn) !important;
-    will-change: transform, background-color, color;
+    overflow: hidden !important;
+    font-size: 0 !important;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    will-change: transform;
     transform: translateZ(0);
 }
 
-/* Nasconde eventuale icona FontAwesome o HTML interna */
-.btn-delete-week i, 
-.btn-delete-week svg {
+/* Caricamento dell'immagine cestino.png come sfondo */
+.btn-delete-week::before {
+    content: "" !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('cestino.png') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Nasconde categoricamente testi nativi, 'X' o icone di testo */
+.btn-delete-week::after {
+    content: none !important;
+}
+
+.btn-delete-week * {
     display: none !important;
 }
 
-/* Inserisce l'icona ✕ pulita via CSS */
-.btn-delete-week::after {
-    content: "✕";
-    font-size: 0.95rem;
-    font-weight: 800;
-    line-height: 1;
-}
-
+/* Effetto al passaggio del mouse (Hover) */
 .btn-delete-week:hover {
-    background: var(--danger-color) !important;
-    color: #ffffff !important;
-    transform: scale(1.08) translateZ(0);
+    transform: scale(1.15) rotate(-5deg) translateZ(0) !important;
 }
 
+/* Effetto al click (Active) */
 .btn-delete-week:active {
-    transform: scale(0.92) translateZ(0);
+    transform: scale(0.9) translateZ(0) !important;
 }
 
 /* Freccetta Espansione Settimana */
