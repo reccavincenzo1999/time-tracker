@@ -602,6 +602,9 @@ function renderEntries() {
         return;
     }
 
+    // Ordina gli elementi dal più recente (in alto) al più vecchio (in basso)
+    workEntries.sort((a, b) => new Date(b.clockInTime) - new Date(a.clockInTime));
+
     // 1. Group by Year and Week
     const grouped = {};
     workEntries.forEach(entry => {
