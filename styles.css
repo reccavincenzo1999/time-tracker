@@ -320,7 +320,7 @@ select {
     user-select: none;
 }
 
-/* POSIZIONAMENTO BOX INGRESSI SOTTO LA SCRITTA SETTIMANA */
+/* BOX INGRESSI SOTTO LA SCRITTA SETTIMANA */
 .week-header-info {
     display: flex;
     flex-direction: column;
@@ -511,7 +511,7 @@ select {
 .entry-value.primary { color: var(--primary-light); }
 .entry-value.success { color: var(--success-color); }
 
-/* Box Pausa Pranzo (Mobile Optimized) */
+/* Box Pausa Pranzo */
 .lunch-break-table {
     background: linear-gradient(135deg, #f3e8ff 0%, #fae8ff 100%);
     box-shadow: var(--shadow-extruded-sm);
@@ -574,7 +574,7 @@ select {
     border-top: 1px solid #f0abfc;
 }
 
-/* Pulsanti Azione e Pulsanti Pausa Pranzo (Con Colori Diversi) */
+/* Pulsanti Azione e Pulsanti Pausa Pranzo */
 .btn,
 .btn-primary, 
 .btn-secondary,
@@ -625,26 +625,41 @@ button[type="submit"],
     box-shadow: 3px 3px 8px rgba(2, 132, 199, 0.3) !important;
 }
 
-/* 1. PULSANTE MODIFICA PAUSA PRANZO (Smeraldo / Verde Acqua) */
-.btn-edit, .btn-edit-small {
+/* 1. PULSANTE MODIFICA PAUSA PRANZO (VIOLA INDACO) */
+.lunch-break-table-actions .btn-edit-small,
+.lunch-break-table-actions .btn-edit {
+    background: linear-gradient(135deg, #6d28d9, #4c1d95) !important;
+    color: white !important;
+    box-shadow: 3px 3px 8px rgba(109, 40, 217, 0.35) !important;
+}
+
+.lunch-break-table-actions .btn-edit-small:active,
+.lunch-break-table-actions .btn-edit:active {
+    transform: scale(0.95);
+}
+
+/* 2. PULSANTE ELIMINA PAUSA PRANZO (ARANCIONE AMBRA) */
+.lunch-break-table-actions .btn-delete-small,
+.lunch-break-table-actions .btn-delete {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    color: white !important;
+    box-shadow: 3px 3px 8px rgba(217, 119, 6, 0.35) !important;
+}
+
+.lunch-break-table-actions .btn-delete-small:active,
+.lunch-break-table-actions .btn-delete:active {
+    transform: scale(0.95);
+}
+
+/* Pulsanti Modifica/Elimina Generali (Card Ingresso Principale) */
+.entry-actions .btn-edit {
     background: linear-gradient(135deg, #0d9488, #0f766e) !important;
     color: white !important;
-    box-shadow: 3px 3px 8px rgba(13, 148, 136, 0.35) !important;
 }
 
-.btn-edit:active, .btn-edit-small:active {
-    transform: scale(0.95);
-}
-
-/* 2. PULSANTE ELIMINA PAUSA PRANZO (Rosso Amarena / Crimson) */
-.btn-delete, .btn-delete-small {
+.entry-actions .btn-delete {
     background: linear-gradient(135deg, #e11d48, #be123c) !important;
     color: white !important;
-    box-shadow: 3px 3px 8px rgba(225, 29, 72, 0.35) !important;
-}
-
-.btn-delete:active, .btn-delete-small:active {
-    transform: scale(0.95);
 }
 
 /* Pulsanti Secondari */
