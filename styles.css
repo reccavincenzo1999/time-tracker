@@ -27,6 +27,7 @@
     --shadow-extruded-sm: 4px 4px 10px #c4cddb, -4px -4px 10px #ffffff;
     --shadow-inset: inset 4px 4px 8px #c4cddb, inset -4px -4px 8px #ffffff;
     --shadow-btn-primary: 4px 4px 12px rgba(0, 66, 140, 0.35), -2px -2px 8px rgba(255, 255, 255, 0.8);
+    --shadow-btn-danger: 4px 4px 12px rgba(220, 38, 38, 0.25), -2px -2px 8px rgba(255, 255, 255, 0.8);
 
     --radius-lg: 24px;
     --radius-md: 18px;
@@ -93,7 +94,7 @@ header.header {
     letter-spacing: -0.02em;
 }
 
-/* Bottone '+' Principale Neumorfico */
+/* Bottone '+' Principale Neumorfico nell'Header */
 #addBtn, .btn-icon {
     background: linear-gradient(135deg, #0052b3, var(--primary-color));
     color: white;
@@ -109,11 +110,11 @@ header.header {
     transition: var(--transition-btn);
 }
 
-#addBtn svg {
+#addBtn svg, .btn-icon svg {
     stroke: #ffffff;
 }
 
-#addBtn:active {
+#addBtn:active, .btn-icon:active {
     transform: scale(0.94);
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
 }
@@ -279,7 +280,7 @@ select {
     accent-color: var(--primary-color);
 }
 
-/* Modali Footer */
+/* Modali Footer & Pulsanti Standard */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -295,6 +296,10 @@ select {
     border: none;
     cursor: pointer;
     transition: var(--transition-btn);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
 }
 
 .btn-secondary {
@@ -307,7 +312,7 @@ select {
     box-shadow: var(--shadow-inset);
 }
 
-.btn-primary {
+.btn-primary, button[type="submit"] {
     background: linear-gradient(135deg, #0052b3, var(--primary-color));
     color: white;
     box-shadow: var(--shadow-btn-primary);
@@ -315,6 +320,7 @@ select {
 
 .btn-primary:active {
     transform: scale(0.96);
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
 }
 
 /* Sezioni & Lista Ingressi */
@@ -355,17 +361,74 @@ select {
     border-bottom: 2px solid rgba(203, 213, 225, 0.4);
 }
 
+.week-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+}
+
 .entry-card {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded-sm);
     border-radius: var(--radius-md);
-    padding: 1rem;
-    margin-bottom: 0.85rem;
+    padding: 1.1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255,255,255,0.8);
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 0.5rem 0;
     font-size: 0.9rem;
+}
+
+/* Uniformazione Pulsanti Interni alla Card (Modifica, Elimina, Aggiungi Uscita/Pausa) */
+.entry-actions, .lunch-break-actions, .card-actions, button.btn-sm, button.btn-action {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 0.85rem;
+}
+
+/* Tutti i bottoni generati da JS prendono lo stile coerente con il tasto Salva */
+.entry-card button, .week-group button:not(.btn-close) {
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 0.8rem;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-btn);
+    background: linear-gradient(135deg, #0052b3, var(--primary-color));
+    color: white;
+    box-shadow: var(--shadow-btn-primary);
+}
+
+.entry-card button:active, .week-group button:active {
+    transform: scale(0.95);
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Tasto Elimina / Cancellazione */
+.entry-card button.btn-delete, 
+.entry-card button.delete-btn, 
+.week-group button.btn-delete-week {
+    background: linear-gradient(135deg, #ef4444, var(--danger-color)) !important;
+    color: white !important;
+    box-shadow: var(--shadow-btn-danger) !important;
+}
+
+/* Tasto Annulla o Pulsanti Secondari nelle Card */
+.entry-card button.btn-secondary, 
+.entry-card button.btn-outline {
+    background: var(--bg-color) !important;
+    color: #475569 !important;
+    box-shadow: var(--shadow-extruded-sm) !important;
+}
+
+.entry-card button.btn-secondary:active {
+    box-shadow: var(--shadow-inset) !important;
 }
