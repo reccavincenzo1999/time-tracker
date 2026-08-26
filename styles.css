@@ -22,11 +22,11 @@
     --lunch-expected-color: #7c3aed;
     --lunch-actual-color: #c026d3;
     
-    /* Ombre Neumorfiche Soft-UI */
-    --shadow-extruded: 8px 8px 16px #c4cddb, -8px -8px 16px #ffffff;
-    --shadow-extruded-sm: 4px 4px 10px #c4cddb, -4px -4px 10px #ffffff;
-    --shadow-inset: inset 4px 4px 8px #c4cddb, inset -4px -4px 8px #ffffff;
-    --shadow-btn-primary: 4px 4px 12px rgba(0, 66, 140, 0.35), -2px -2px 8px rgba(255, 255, 255, 0.8);
+    /* Ombre Neumorfiche Soft-UI ottimizzate per evitare aloni bianchi */
+    --shadow-extruded: 6px 6px 14px #c4cddb, -4px -4px 10px #ffffff;
+    --shadow-extruded-sm: 4px 4px 10px #c4cddb, -2px -2px 6px #ffffff;
+    --shadow-inset: inset 4px 4px 8px #c4cddb, inset -3px -3px 6px #ffffff;
+    --shadow-btn-primary: 4px 4px 12px rgba(0, 66, 140, 0.35);
 
     --radius-lg: 24px;
     --radius-md: 18px;
@@ -36,11 +36,13 @@
     --transition-btn: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* FIX SFONDO BIANCO: html e body condividono rigidamente lo stesso colore di sfondo */
 html, body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    background-color: var(--bg-color);
+    background-color: var(--bg-color) !important;
+    background: var(--bg-color) !important;
 }
 
 body {
@@ -65,9 +67,10 @@ body {
     position: relative;
     z-index: 1;
     overflow-x: hidden;
+    background: transparent;
 }
 
-/* Header Neumorfico */
+/* Header Neumorfico (Senza aloni superiori bianchi) */
 header.header {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded);
@@ -171,14 +174,14 @@ header.header {
     word-break: break-word;
 }
 
-/* Modali Neumorfiche Mobile-Friendly */
+/* Modali */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(230, 236, 245, 0.85);
+    background: rgba(230, 236, 245, 0.92);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
@@ -320,7 +323,6 @@ select {
     user-select: none;
 }
 
-/* BOX INGRESSI SOTTO LA SCRITTA SETTIMANA */
 .week-header-info {
     display: flex;
     flex-direction: column;
@@ -410,7 +412,7 @@ select {
     box-shadow: var(--shadow-inset) !important;
 }
 
-/* Card Ingressi (iPhone Optimized) */
+/* Card Ingressi */
 .entry-card {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded-sm);
@@ -574,7 +576,7 @@ select {
     border-top: 1px solid #f0abfc;
 }
 
-/* Pulsanti Azione e Pulsanti Pausa Pranzo */
+/* Pulsanti Azione */
 .btn,
 .btn-primary, 
 .btn-secondary,
@@ -600,7 +602,6 @@ select {
     white-space: nowrap;
 }
 
-/* Pulsante Principale / Salva */
 .btn-primary, 
 .btn-add-clockout, 
 button[type="submit"],
@@ -618,14 +619,13 @@ button[type="submit"],
     transform: scale(0.96) !important;
 }
 
-/* Pulsante Aggiungi Pausa */
 .btn-add-lunch, .btn-add-lunch-actual {
     background: linear-gradient(135deg, #0284c7, #0369a1) !important;
     color: white !important;
     box-shadow: 3px 3px 8px rgba(2, 132, 199, 0.3) !important;
 }
 
-/* 1. PULSANTE MODIFICA PAUSA PRANZO (VIOLA INDACO) */
+/* Pulsanti Pausa Pranzo (Viola e Arancione) */
 .lunch-break-table-actions .btn-edit-small,
 .lunch-break-table-actions .btn-edit {
     background: linear-gradient(135deg, #6d28d9, #4c1d95) !important;
@@ -633,12 +633,6 @@ button[type="submit"],
     box-shadow: 3px 3px 8px rgba(109, 40, 217, 0.35) !important;
 }
 
-.lunch-break-table-actions .btn-edit-small:active,
-.lunch-break-table-actions .btn-edit:active {
-    transform: scale(0.95);
-}
-
-/* 2. PULSANTE ELIMINA PAUSA PRANZO (ARANCIONE AMBRA) */
 .lunch-break-table-actions .btn-delete-small,
 .lunch-break-table-actions .btn-delete {
     background: linear-gradient(135deg, #d97706, #b45309) !important;
@@ -646,12 +640,7 @@ button[type="submit"],
     box-shadow: 3px 3px 8px rgba(217, 119, 6, 0.35) !important;
 }
 
-.lunch-break-table-actions .btn-delete-small:active,
-.lunch-break-table-actions .btn-delete:active {
-    transform: scale(0.95);
-}
-
-/* Pulsanti Modifica/Elimina Generali (Card Ingresso Principale) */
+/* Pulsanti Card Ingresso */
 .entry-actions .btn-edit {
     background: linear-gradient(135deg, #0d9488, #0f766e) !important;
     color: white !important;
@@ -662,7 +651,6 @@ button[type="submit"],
     color: white !important;
 }
 
-/* Pulsanti Secondari */
 .btn-secondary, #cancelAddBtn, #cancelLunchBreakBtn {
     background: var(--bg-color) !important;
     color: #475569 !important;
