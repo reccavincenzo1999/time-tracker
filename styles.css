@@ -51,6 +51,8 @@ body {
     max-width: 620px;
     margin: 0 auto;
     padding-bottom: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 /* Header Neumorfico */
@@ -63,6 +65,8 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    z-index: 10;
 }
 
 .header-title-group h1 {
@@ -92,6 +96,9 @@ header {
     gap: 0.5rem;
     box-shadow: var(--shadow-btn-primary);
     cursor: pointer;
+    position: relative;
+    z-index: 20;
+    pointer-events: auto !important;
     transition: var(--transition-btn);
 }
 
@@ -100,7 +107,7 @@ header {
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
 }
 
-/* Modale Neumorfica */
+/* Modale Neumorfica (con pointer-events disabilitati quando nascosta) */
 .modal {
     position: fixed;
     top: 0;
@@ -116,6 +123,7 @@ header {
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: all 0.25s ease;
     padding: 1rem;
 }
@@ -123,6 +131,7 @@ header {
 .modal.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .modal-content {
@@ -171,6 +180,31 @@ header {
 }
 
 .close-btn:active {
+    box-shadow: var(--shadow-inset);
+}
+
+/* Form Actions nella Modale */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn-secondary {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded-sm);
+    color: #475569;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 0.65rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition-btn);
+}
+
+.btn-secondary:active {
     box-shadow: var(--shadow-inset);
 }
 
@@ -248,7 +282,7 @@ header {
     width: fit-content;
 }
 
-/* Pulsante Elimina Settimana (Icona Riciclo) */
+/* Pulsante Elimina Settimana */
 .btn-delete-week {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded-sm);
