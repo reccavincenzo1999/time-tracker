@@ -22,7 +22,7 @@
     --lunch-expected-color: #7c3aed;
     --lunch-actual-color: #c026d3;
     
-    /* Neumorphic Shadows */
+    /* Ombre Neumorfiche Soft-UI */
     --shadow-extruded: 8px 8px 16px #c4cddb, -8px -8px 16px #ffffff;
     --shadow-extruded-sm: 4px 4px 10px #c4cddb, -4px -4px 10px #ffffff;
     --shadow-inset: inset 4px 4px 8px #c4cddb, inset -4px -4px 8px #ffffff;
@@ -46,7 +46,12 @@ body {
     align-items: flex-start;
 }
 
-.app-container {
+/* Gestione globale elementi nascosti */
+.hidden {
+    display: none !important;
+}
+
+.app {
     width: 100%;
     max-width: 620px;
     margin: 0 auto;
@@ -56,11 +61,11 @@ body {
 }
 
 /* Header Neumorfico */
-header {
+header.header {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded);
     border-radius: var(--radius-lg);
-    padding: 1.25rem 1.5rem;
+    padding: 1.1rem 1.4rem;
     margin-bottom: 1.5rem;
     display: flex;
     justify-content: space-between;
@@ -69,45 +74,89 @@ header {
     z-index: 10;
 }
 
-.header-title-group h1 {
-    font-size: 1.4rem;
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-brand .logo img {
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-extruded-sm);
+    display: block;
+}
+
+.header-brand h1 {
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--primary-color);
     letter-spacing: -0.02em;
 }
 
-.header-title-group p {
-    font-size: 0.825rem;
-    color: #64748b;
-    font-weight: 500;
-}
-
 /* Bottone '+' Principale Neumorfico */
-.btn-primary, #addBtn {
+#addBtn, .btn-icon {
     background: linear-gradient(135deg, #0052b3, var(--primary-color));
     color: white;
     border: none;
-    border-radius: var(--radius-pill);
-    padding: 0.75rem 1.4rem;
-    font-weight: 700;
-    font-size: 0.9rem;
-    display: inline-flex;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
     box-shadow: var(--shadow-btn-primary);
     cursor: pointer;
-    position: relative;
-    z-index: 20;
-    pointer-events: auto !important;
     transition: var(--transition-btn);
 }
 
-.btn-primary:active, #addBtn:active {
-    transform: scale(0.96);
+#addBtn svg {
+    stroke: #ffffff;
+}
+
+#addBtn:active {
+    transform: scale(0.94);
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
 }
 
-/* Modale Neumorfica (con pointer-events disabilitati quando nascosta) */
+/* Loading & Messages */
+.loading {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    text-align: center;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(0, 66, 140, 0.2);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 0.5rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    background: #fee2e2;
+    color: var(--danger-color);
+    box-shadow: var(--shadow-extruded-sm);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Modali Neumorfiche */
 .modal {
     position: fixed;
     top: 0;
@@ -121,17 +170,7 @@ header {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: all 0.25s ease;
     padding: 1rem;
-}
-
-.modal.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
 }
 
 .modal-content {
@@ -139,31 +178,27 @@ header {
     box-shadow: var(--shadow-extruded);
     border-radius: var(--radius-lg);
     width: 100%;
-    max-width: 520px;
-    padding: 1.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    transform: scale(0.95);
-    transition: transform 0.25s ease;
-}
-
-.modal.active .modal-content {
-    transform: scale(1);
+    max-width: 500px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .modal-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     color: var(--primary-color);
     font-weight: 800;
 }
 
-.close-btn {
+.btn-close {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded-sm);
     border: none;
@@ -175,42 +210,17 @@ header {
     justify-content: center;
     cursor: pointer;
     color: #64748b;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     transition: var(--transition-btn);
 }
 
-.close-btn:active {
+.btn-close:active {
     box-shadow: var(--shadow-inset);
 }
 
-/* Form Actions nella Modale */
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-}
-
-.btn-secondary {
-    background: var(--bg-color);
-    box-shadow: var(--shadow-extruded-sm);
-    color: #475569;
-    border: none;
-    border-radius: var(--radius-pill);
-    padding: 0.65rem 1.25rem;
-    font-weight: 700;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: var(--transition-btn);
-}
-
-.btn-secondary:active {
-    box-shadow: var(--shadow-inset);
-}
-
-/* Input scavati (Inset Neumorphic) */
+/* Form e Input scavati */
 .form-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.1rem;
 }
 
 .form-group label {
@@ -218,12 +228,15 @@ header {
     font-size: 0.825rem;
     font-weight: 700;
     color: #475569;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
 }
 
-.form-control, input[type="text"], input[type="datetime-local"], select {
+input[type="text"], 
+input[type="date"], 
+input[type="time"], 
+select {
     width: 100%;
-    padding: 0.85rem 1rem;
+    padding: 0.8rem 1rem;
     background: var(--bg-color);
     box-shadow: var(--shadow-inset);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -232,222 +245,87 @@ header {
     color: #1e293b;
     font-weight: 600;
     outline: none;
+}
+
+.expected-info, .lunch-break-note {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-inset);
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.1rem;
+    font-size: 0.825rem;
+    color: #475569;
+}
+
+.expected-info strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+/* Modali Footer */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    padding: 0.7rem 1.3rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
     transition: var(--transition-btn);
 }
 
-.form-control:focus {
-    border-color: var(--primary-light);
-}
-
-/* Settimane & Gruppi */
-.week-group {
+.btn-secondary {
     background: var(--bg-color);
-    box-shadow: var(--shadow-extruded);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
-    margin-bottom: 1.75rem;
-    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: var(--shadow-extruded-sm);
+    color: #475569;
 }
 
-.week-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding-bottom: 0.85rem;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid rgba(203, 213, 225, 0.4);
+.btn-secondary:active {
+    box-shadow: var(--shadow-inset);
 }
 
-.week-title-area {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+.btn-primary {
+    background: linear-gradient(135deg, #0052b3, var(--primary-color));
+    color: white;
+    box-shadow: var(--shadow-btn-primary);
 }
 
-.week-title {
+.btn-primary:active {
+    transform: scale(0.96);
+}
+
+/* Sezioni & Lista Ingressi */
+.entries-section h2 {
     font-size: 1.1rem;
     font-weight: 800;
     color: var(--primary-dark);
-}
-
-.week-badge {
-    font-size: 0.775rem;
-    font-weight: 700;
-    color: #64748b;
-    background: var(--bg-color);
-    box-shadow: var(--shadow-inset);
-    padding: 0.25rem 0.65rem;
-    border-radius: var(--radius-pill);
-    display: inline-block;
-    width: fit-content;
-}
-
-/* Pulsante Elimina Settimana */
-.btn-delete-week {
-    background: var(--bg-color);
-    box-shadow: var(--shadow-extruded-sm);
-    border: none;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--transition-btn);
-    padding: 8px;
-}
-
-.btn-delete-week img {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-}
-
-.btn-delete-week:active {
-    box-shadow: var(--shadow-inset);
-}
-
-/* Card Ingressi Giornalieri */
-.entry-card {
-    background: var(--bg-color);
-    box-shadow: var(--shadow-extruded-sm);
-    border-radius: var(--radius-md);
-    padding: 1.1rem;
     margin-bottom: 1rem;
-    border: 1px solid rgba(255,255,255,0.8);
-    transition: var(--transition-btn);
+    padding-left: 0.25rem;
 }
 
-.entry-card:last-child {
-    margin-bottom: 0;
-}
-
-.entry-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-}
-
-.entry-date {
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: var(--primary-color);
-}
-
-.entry-status {
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.25rem 0.65rem;
-    border-radius: var(--radius-pill);
-    background: var(--bg-color);
-    box-shadow: var(--shadow-inset);
-}
-
-.entry-status.completed { color: var(--success-color); }
-.entry-status.in-progress { color: var(--warning-color); }
-
-.entry-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 0.85rem;
-    margin-bottom: 0.85rem;
-}
-
-.detail-item {
-    background: var(--bg-color);
-    box-shadow: var(--shadow-inset);
-    padding: 0.65rem 0.85rem;
-    border-radius: var(--radius-sm);
-}
-
-.detail-label {
-    font-size: 0.725rem;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.detail-value {
-    font-size: 0.9rem;
-    font-weight: 800;
-    color: #1e293b;
-    margin-top: 0.15rem;
-}
-
-/* Sezione Pausa Pranzo dentro la Card */
-.lunch-break-section {
-    background: var(--bg-color);
-    box-shadow: var(--shadow-inset);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 0.85rem;
-    margin-top: 0.75rem;
-}
-
-.lunch-break-title {
-    font-size: 0.775rem;
-    font-weight: 800;
-    color: var(--lunch-expected-color);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.lunch-details-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-}
-
-.lunch-value.primary { color: var(--lunch-expected-color) !important; }
-.lunch-value.success { color: var(--lunch-actual-color) !important; }
-
-/* Azioni e Pulsanti Piccoli nelle Card */
-.entry-actions, .lunch-break-table-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.65rem;
-    margin-top: 0.85rem;
-    padding-top: 0.65rem;
-}
-
-.btn-add-clockout, .btn-add-lunch-actual, .btn-edit-small, .btn-delete-small {
-    border: none;
-    padding: 0.45rem 0.9rem;
-    border-radius: var(--radius-pill);
-    font-size: 0.775rem;
-    font-weight: 800;
-    cursor: pointer;
-    background: var(--bg-color);
-    box-shadow: var(--shadow-extruded-sm);
-    transition: var(--transition-btn);
-}
-
-.btn-add-clockout { color: var(--primary-light); }
-.btn-add-lunch-actual { color: #0284c7; }
-.btn-edit-small { color: #0f766e; }
-.btn-delete-small { color: var(--danger-color); }
-
-.btn-add-clockout:active, .btn-add-lunch-actual:active, .btn-edit-small:active, .btn-delete-small:active {
-    box-shadow: var(--shadow-inset);
-}
-
-/* Stato di Caricamento (Loading Indicator) */
-.loading-indicator {
-    background: var(--bg-color);
-    box-shadow: var(--shadow-extruded);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    text-align: center;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-/* Stato Vuoto (Empty State) */
 .empty-state {
     background: var(--bg-color);
     box-shadow: var(--shadow-inset);
@@ -455,10 +333,39 @@ header {
     padding: 2.5rem 1.5rem;
     text-align: center;
     color: #64748b;
+    font-weight: 600;
 }
 
-.empty-state h3 {
-    font-weight: 800;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
+/* Stili per elementi generati da app.js (Settimane & Card) */
+.week-group {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.7);
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid rgba(203, 213, 225, 0.4);
+}
+
+.entry-card {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded-sm);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
 }
