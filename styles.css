@@ -9,6 +9,7 @@
 }
 
 :root {
+    --bg-color: #e6ecf5;
     --primary-color: #00428c;
     --primary-dark: #002959;
     --primary-light: #0066d6;
@@ -21,89 +22,639 @@
     --lunch-expected-color: #7c3aed;
     --lunch-actual-color: #c026d3;
     
-    --background: radial-gradient(circle at 10% 20%, rgba(255, 245, 204, 0.8) 0%, rgba(255, 252, 235, 1) 90%);
-    --card-background: rgba(255, 255, 255, 0.85);
-    --card-border: rgba(255, 255, 255, 0.95);
-    
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --border-color: rgba(0, 66, 140, 0.12);
-    
-    --shadow-sm: 0 4px 12px rgba(0, 41, 89, 0.06);
-    --shadow-md: 0 10px 25px -5px rgba(0, 41, 89, 0.12);
-    --shadow-lg: 0 20px 35px -10px rgba(0, 30, 70, 0.2);
-    --shadow-btn: 0 4px 12px rgba(0, 66, 140, 0.25);
-    --shadow-btn-danger: 0 4px 12px rgba(220, 38, 38, 0.25);
-    
-    --header-gradient: linear-gradient(135deg, #00428c 0%, #001f45 100%);
-    
-    --radius-sm: 10px;
-    --radius-md: 16px;
+    /* Ombre Neumorfiche Soft-UI originali */
+    --shadow-extruded: 8px 8px 16px #c4cddb, -8px -8px 16px #ffffff;
+    --shadow-extruded-sm: 4px 4px 10px #c4cddb, -4px -4px 10px #ffffff;
+    --shadow-inset: inset 4px 4px 8px #c4cddb, inset -4px -4px 8px #ffffff;
+    --shadow-btn-primary: 4px 4px 12px rgba(0, 66, 140, 0.35), -2px -2px 8px rgba(255, 255, 255, 0.8);
+    --shadow-btn-danger: 4px 4px 12px rgba(220, 38, 38, 0.3), -2px -2px 8px rgba(255, 255, 255, 0.8);
+
     --radius-lg: 24px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
     --radius-pill: 50px;
     
-    --transition-smooth: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-    --transition-btn: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-html {
-    scroll-behavior: smooth;
-    width: 100%;
+    --transition-btn: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
-    background: var(--background);
-    background-attachment: fixed;
-    color: var(--text-primary);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+    background-color: var(--bg-color);
+    color: #2d3748;
     min-height: 100vh;
-    width: 100%;
-    overflow-x: hidden;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .app {
+    width: 100%;
     max-width: 620px;
     margin: 0 auto;
-    min-height: 100vh;
     padding-bottom: 2rem;
-    width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
-/* Header Floating Glass */
-.header {
-    background: var(--header-gradient);
-    padding: 1.1rem 1.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 12px;
-    z-index: 100;
-    margin: 0 12px 1.5rem 12px;
+/* Header Neumorfico */
+header.header {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded);
     border-radius: var(--radius-lg);
-    box-shadow: 0 12px 30px rgba(0, 31, 69, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
 }
 
 .header-brand {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 0.75rem;
 }
 
-.logo {
+.header-brand .logo img {
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-extruded-sm);
+    display: block;
+}
+
+.header-brand h1 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    letter-spacing: -0.02em;
+}
+
+/* Bottone '+' Principale Header */
+#addBtn, .btn-icon {
+    background: linear-gradient(135deg, #0052b3, var(--primary-color));
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    background: #ffffff;
-    padding: 3px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-btn-primary);
+    cursor: pointer;
+    transition: var(--transition-btn);
 }
 
-.logo img {
+#addBtn svg, .btn-icon svg {
+    stroke: #ffffff;
+}
+
+#addBtn:active, .btn-icon:active {
+    transform: scale(0.94);
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Loading Indicator */
+.loading {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    text-align: center;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(0, 66, 140, 0.2);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 0.5rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    background: #fee2e2;
+    color: var(--danger-color);
+    box-shadow: var(--shadow-extruded-sm);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Modali Neumorfiche */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(230, 236, 245, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 500px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.modal-header h2 {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.btn-close {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded-sm);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 1.25rem;
+    transition: var(--transition-btn);
+}
+
+.btn-close:active {
+    box-shadow: var(--shadow-inset);
+}
+
+/* Form e Input Inset */
+.form-group {
+    margin-bottom: 1.1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 0.4rem;
+}
+
+input[type="text"], 
+input[type="date"], 
+input[type="time"], 
+select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: var(--bg-color);
+    box-shadow: var(--shadow-inset);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    color: #1e293b;
+    font-weight: 600;
+    outline: none;
+}
+
+.expected-info, .lunch-break-note {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-inset);
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.1rem;
+    font-size: 0.825rem;
+    color: #475569;
+}
+
+.expected-info strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+/* Modale Footer */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+/* Titolo Sezioni e Empty State */
+.entries-section h2 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+    padding-left: 0.25rem;
+}
+
+.empty-state {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-inset);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Gruppo Settimanale Neumorfico */
+.week-group {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(203, 213, 225, 0.4);
+    cursor: pointer;
+    user-select: none;
+}
+
+.week-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.week-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+}
+
+.week-count {
+    font-size: 0.775rem;
+    font-weight: 700;
+    color: #64748b;
+    background: var(--bg-color);
+    box-shadow: var(--shadow-inset);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+    display: inline-block;
+    width: fit-content;
+}
+
+.week-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+/* Freccia di espansione Settimana */
+.week-toggle-icon {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded-sm);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.week-group.collapsed .week-toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.week-group.collapsed .week-content {
+    display: none !important;
+}
+
+.week-content {
+    margin-top: 1rem;
+}
+
+/* Pulsante Elimina Settimana */
+.btn-delete-week {
+    background: var(--bg-color) !important;
+    box-shadow: var(--shadow-extruded-sm) !important;
+    border: none !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    transition: var(--transition-btn);
+    padding: 6px !important;
+}
+
+.btn-delete-week img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.btn-delete-week:active {
+    box-shadow: var(--shadow-inset) !important;
+}
+
+/* Card Ingressi */
+.entry-card {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded-sm);
+    border-radius: var(--radius-md);
+    padding: 1.1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: var(--transition-btn);
+}
+
+.entry-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.entry-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.entry-date {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--primary-color);
+}
+
+/* Freccia Singola Card */
+.btn-toggle-card {
+    background: var(--bg-color);
+    box-shadow: var(--shadow-extruded-sm);
+    border: none;
     width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+.chevron {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    transition: transform 0.3s ease;
+}
+
+.entry-card.collapsed .entry-card-body {
+    display: none;
+}
+
+.entry-card.collapsed .chevron {
+    transform: rotate(-90deg);
+}
+
+/* Righe dati Card */
+.entry-card-body {
+    margin-top: 0.85rem;
+}
+
+.entry-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0.75rem;
+    background: var(--bg-color);
+    box-shadow: var(--shadow-inset);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.5rem;
+}
+
+.entry-label {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.entry-value {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.entry-value.primary { color: var(--primary-light); }
+.entry-value.success { color: var(--success-color); }
+
+/* ==========================================================================
+   BOX PAUSA PRANZO RISPRISTINATO (Sfondo Violetto Evidenziato)
+   ========================================================================== */
+.lunch-break-table {
+    background: linear-gradient(135deg, #f3e8ff 0%, #fae8ff 100%);
+    box-shadow: var(--shadow-extruded-sm);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 1px solid #e9d5ff;
+}
+
+.lunch-break-table-header {
+    color: var(--lunch-expected-color);
+    font-weight: 800;
+    font-size: 0.8rem;
+    margin-bottom: 0.65rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.lunch-break-table-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0.75rem;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.4rem;
+}
+
+.lunch-label {
+    color: #6b21a8;
+    font-weight: 700;
+    font-size: 0.825rem;
+}
+
+.lunch-value {
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.lunch-value.primary { color: var(--lunch-expected-color) !important; }
+.lunch-value.success { color: var(--lunch-actual-color) !important; }
+
+.lunch-break-table-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid #f0abfc;
+}
+
+/* ==========================================================================
+   PULSANTI UNIFORMATI ALLO STILE "SALVA" NEUMORFICO
+   ========================================================================== */
+.btn,
+.btn-primary, 
+.btn-secondary,
+.btn-add-clockout, 
+.btn-add-lunch, 
+.btn-edit, 
+.btn-delete,
+.btn-add-lunch-actual, 
+.btn-edit-small, 
+.btn-delete-small {
+    padding: 0.65rem 1.3rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-btn);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    outline: none;
+}
+
+/* Tasto Principale (Stile Salva / Blu Gradiente con Ombra Soft) */
+.btn-primary, 
+.btn-add-clockout, 
+button[type="submit"],
+#saveEntryBtn, 
+#saveLunchBreakBtn {
+    background: linear-gradient(135deg, #0052b3, var(--primary-color)) !important;
+    color: white !important;
+    box-shadow: var(--shadow-btn-primary) !important;
+}
+
+.btn-primary:active, 
+.btn-add-clockout:active,
+#saveEntryBtn:active, 
+#saveLunchBreakBtn:active {
+    transform: scale(0.96) !important;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3) !important;
+}
+
+/* Tasto Pausa Pranzo */
+.btn-add-lunch, .btn-add-lunch-actual {
+    background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+    color: white !important;
+    box-shadow: 4px 4px 12px rgba(2, 132, 199, 0.3) !important;
+}
+
+.btn-add-lunch:active, .btn-add-lunch-actual:active {
+    transform: scale(0.96);
+}
+
+/* Tasto Modifica */
+.btn-edit, .btn-edit-small {
+    background: linear-gradient(135deg, #0d9488, #0f766e) !important;
+    color: white !important;
+    box-shadow: 4px 4px 12px rgba(13, 148, 136, 0.3) !important;
+}
+
+.btn-edit:active, .btn-edit-small:active {
+    transform: scale(0.96);
+}
+
+/* Tasto Elimina */
+.btn-delete, .btn-delete-small {
+    background: linear-gradient(135deg, #ef4444, var(--danger-color)) !important;
+    color: white !important;
+    box-shadow: var(--shadow-btn-danger) !important;
+}
+
+.btn-delete:active, .btn-delete-small:active {
+    transform: scale(0.96);
+}
+
+/* Tasto Annulla / Secondario */
+.btn-secondary, #cancelAddBtn, #cancelLunchBreakBtn {
+    background: var(--bg-color) !important;
+    color: #475569 !important;
+    box-shadow: var(--shadow-extruded-sm) !important;
+}
+
+.btn-secondary:active, #cancelAddBtn:active, #cancelLunchBreakBtn:active {
+    box-shadow: var(--shadow-inset) !important;
+}
+
+.entry-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    margin-top: 0.85rem;
+    padding-top: 0.65rem;
+}
