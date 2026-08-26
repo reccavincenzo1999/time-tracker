@@ -22,7 +22,7 @@
     --lunch-expected-color: #7c3aed;
     --lunch-actual-color: #c026d3;
     
-    /* Ombre Neumorfiche Soft-UI originali */
+    /* Ombre Neumorfiche Soft-UI */
     --shadow-extruded: 8px 8px 16px #c4cddb, -8px -8px 16px #ffffff;
     --shadow-extruded-sm: 4px 4px 10px #c4cddb, -4px -4px 10px #ffffff;
     --shadow-inset: inset 4px 4px 8px #c4cddb, inset -4px -4px 8px #ffffff;
@@ -93,7 +93,7 @@ header.header {
     letter-spacing: -0.02em;
 }
 
-/* Bottone '+' Principale Header */
+/* Tasto '+' Header */
 #addBtn, .btn-icon {
     background: linear-gradient(135deg, #0052b3, var(--primary-color));
     color: white;
@@ -287,7 +287,7 @@ select {
     margin-top: 1.5rem;
 }
 
-/* Titolo Sezioni e Empty State */
+/* Titolo Sezioni ed Empty State */
 .entries-section h2 {
     font-size: 1.1rem;
     font-weight: 800;
@@ -327,10 +327,12 @@ select {
     user-select: none;
 }
 
+/* POSIZIONAMENTO TAG INGRESSI SOTTO IL TITOLO SETTIMANA */
 .week-header-info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    align-items: flex-start;
+    gap: 0.4rem;
 }
 
 .week-title {
@@ -340,15 +342,14 @@ select {
 }
 
 .week-count {
-    font-size: 0.775rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: #64748b;
     background: var(--bg-color);
     box-shadow: var(--shadow-inset);
-    padding: 0.25rem 0.65rem;
+    padding: 0.2rem 0.65rem;
     border-radius: var(--radius-pill);
     display: inline-block;
-    width: fit-content;
 }
 
 .week-header-actions {
@@ -357,7 +358,7 @@ select {
     gap: 0.65rem;
 }
 
-/* Freccia di espansione Settimana */
+/* Freccia Espansione Settimana */
 .week-toggle-icon {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded-sm);
@@ -441,7 +442,7 @@ select {
     color: var(--primary-color);
 }
 
-/* Freccia Singola Card */
+/* Freccia Card */
 .btn-toggle-card {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded-sm);
@@ -471,7 +472,7 @@ select {
     transform: rotate(-90deg);
 }
 
-/* Righe dati Card */
+/* Righe Dati Card */
 .entry-card-body {
     margin-top: 0.85rem;
 }
@@ -502,9 +503,7 @@ select {
 .entry-value.primary { color: var(--primary-light); }
 .entry-value.success { color: var(--success-color); }
 
-/* ==========================================================================
-   BOX PAUSA PRANZO RISPRISTINATO (Sfondo Violetto Evidenziato)
-   ========================================================================== */
+/* Box Pausa Pranzo */
 .lunch-break-table {
     background: linear-gradient(135deg, #f3e8ff 0%, #fae8ff 100%);
     box-shadow: var(--shadow-extruded-sm);
@@ -555,15 +554,13 @@ select {
 .lunch-break-table-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 0.6rem;
+    gap: 0.65rem;
     margin-top: 0.75rem;
     padding-top: 0.65rem;
     border-top: 1px solid #f0abfc;
 }
 
-/* ==========================================================================
-   PULSANTI UNIFORMATI ALLO STILE "SALVA" NEUMORFICO
-   ========================================================================== */
+/* Pulsanti Azione */
 .btn,
 .btn-primary, 
 .btn-secondary,
@@ -588,7 +585,7 @@ select {
     outline: none;
 }
 
-/* Tasto Principale (Stile Salva / Blu Gradiente con Ombra Soft) */
+/* Pulsante Principale / Salva */
 .btn-primary, 
 .btn-add-clockout, 
 button[type="submit"],
@@ -607,7 +604,7 @@ button[type="submit"],
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3) !important;
 }
 
-/* Tasto Pausa Pranzo */
+/* Pulsante Pausa Pranzo */
 .btn-add-lunch, .btn-add-lunch-actual {
     background: linear-gradient(135deg, #0284c7, #0369a1) !important;
     color: white !important;
@@ -618,29 +615,31 @@ button[type="submit"],
     transform: scale(0.96);
 }
 
-/* Tasto Modifica */
+/* MODIFICA PAUSA PRANZO (Verde Smeraldo) */
 .btn-edit, .btn-edit-small {
     background: linear-gradient(135deg, #0d9488, #0f766e) !important;
     color: white !important;
-    box-shadow: 4px 4px 12px rgba(13, 148, 136, 0.3) !important;
+    box-shadow: 4px 4px 12px rgba(13, 148, 136, 0.35) !important;
 }
 
 .btn-edit:active, .btn-edit-small:active {
     transform: scale(0.96);
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3) !important;
 }
 
-/* Tasto Elimina */
+/* ELIMINA PAUSA PRANZO (Rosso Amarena / Crimson) */
 .btn-delete, .btn-delete-small {
-    background: linear-gradient(135deg, #ef4444, var(--danger-color)) !important;
+    background: linear-gradient(135deg, #e11d48, #be123c) !important;
     color: white !important;
-    box-shadow: var(--shadow-btn-danger) !important;
+    box-shadow: 4px 4px 12px rgba(225, 29, 72, 0.35) !important;
 }
 
 .btn-delete:active, .btn-delete-small:active {
     transform: scale(0.96);
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3) !important;
 }
 
-/* Tasto Annulla / Secondario */
+/* Pulsanti Secondari / Annulla */
 .btn-secondary, #cancelAddBtn, #cancelLunchBreakBtn {
     background: var(--bg-color) !important;
     color: #475569 !important;
