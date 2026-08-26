@@ -22,10 +22,10 @@
     --lunch-expected-color: #7c3aed;
     --lunch-actual-color: #c026d3;
     
-    /* Ombre Neumorfiche Soft-UI ottimizzate per evitare aloni bianchi */
-    --shadow-extruded: 6px 6px 14px #c4cddb, -4px -4px 10px #ffffff;
-    --shadow-extruded-sm: 4px 4px 10px #c4cddb, -2px -2px 6px #ffffff;
-    --shadow-inset: inset 4px 4px 8px #c4cddb, inset -3px -3px 6px #ffffff;
+    /* Ombre morbide senza riflesso bianco esterno (-4px -4px #ffffff) che creava l'alone sporgente */
+    --shadow-extruded: 6px 8px 16px rgba(160, 175, 200, 0.45);
+    --shadow-extruded-sm: 3px 5px 10px rgba(160, 175, 200, 0.35);
+    --shadow-inset: inset 2px 2px 6px rgba(160, 175, 200, 0.35);
     --shadow-btn-primary: 4px 4px 12px rgba(0, 66, 140, 0.35);
 
     --radius-lg: 24px;
@@ -36,7 +36,6 @@
     --transition-btn: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* FIX SFONDO BIANCO: html e body condividono rigidamente lo stesso colore di sfondo */
 html, body {
     width: 100%;
     max-width: 100%;
@@ -70,7 +69,7 @@ body {
     background: transparent;
 }
 
-/* Header Neumorfico (Senza aloni superiori bianchi) */
+/* Header (Senza aloni superiori bianchi) */
 header.header {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded);
@@ -299,7 +298,7 @@ select {
     font-weight: 600;
 }
 
-/* Gruppo Settimanale Neumorfico */
+/* Gruppo Settimanale */
 .week-group {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded);
@@ -625,7 +624,7 @@ button[type="submit"],
     box-shadow: 3px 3px 8px rgba(2, 132, 199, 0.3) !important;
 }
 
-/* Pulsanti Pausa Pranzo (Viola e Arancione) */
+/* Pulsanti Pausa Pranzo */
 .lunch-break-table-actions .btn-edit-small,
 .lunch-break-table-actions .btn-edit {
     background: linear-gradient(135deg, #6d28d9, #4c1d95) !important;
