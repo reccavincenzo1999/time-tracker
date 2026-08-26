@@ -22,11 +22,11 @@
     --lunch-expected-color: #7c3aed;
     --lunch-actual-color: #c026d3;
     
-    /* Ombre morbide senza riflesso bianco esterno (-4px -4px #ffffff) che creava l'alone sporgente */
-    --shadow-extruded: 6px 8px 16px rgba(160, 175, 200, 0.45);
-    --shadow-extruded-sm: 3px 5px 10px rgba(160, 175, 200, 0.35);
-    --shadow-inset: inset 2px 2px 6px rgba(160, 175, 200, 0.35);
-    --shadow-btn-primary: 4px 4px 12px rgba(0, 66, 140, 0.35);
+    /* Ombre morbide senza riflessi o bagliori esterni */
+    --shadow-extruded: 5px 7px 15px rgba(150, 165, 190, 0.45);
+    --shadow-extruded-sm: 3px 4px 8px rgba(150, 165, 190, 0.35);
+    --shadow-inset: inset 2px 2px 5px rgba(150, 165, 190, 0.35);
+    --shadow-btn-primary: 3px 3px 10px rgba(0, 66, 140, 0.35);
 
     --radius-lg: 24px;
     --radius-md: 18px;
@@ -40,8 +40,8 @@ html, body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    background-color: var(--bg-color) !important;
-    background: var(--bg-color) !important;
+    background-color: #e6ecf5 !important;
+    background: #e6ecf5 !important;
 }
 
 body {
@@ -69,7 +69,7 @@ body {
     background: transparent;
 }
 
-/* Header (Senza aloni superiori bianchi) */
+/* Header pulito senza bordi/riflessi chiari */
 header.header {
     background: var(--bg-color);
     box-shadow: var(--shadow-extruded);
@@ -82,6 +82,8 @@ header.header {
     position: relative;
     z-index: 10;
     width: 100%;
+    border: none !important;
+    outline: none !important;
 }
 
 .header-brand {
@@ -180,7 +182,7 @@ header.header {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(230, 236, 245, 0.92);
+    background: rgba(230, 236, 245, 0.95);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
@@ -197,7 +199,7 @@ header.header {
     width: 100%;
     max-width: 500px;
     padding: 1.25rem;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: none;
     max-height: 90vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -253,7 +255,7 @@ select {
     padding: 0.75rem 0.9rem;
     background: var(--bg-color);
     box-shadow: var(--shadow-inset);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: none;
     border-radius: var(--radius-md);
     font-size: 0.95rem;
     color: #1e293b;
@@ -305,7 +307,7 @@ select {
     border-radius: var(--radius-lg);
     padding: 1rem;
     margin-bottom: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    border: none !important;
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
@@ -418,7 +420,7 @@ select {
     border-radius: var(--radius-md);
     padding: 0.9rem;
     margin-bottom: 0.85rem;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: none !important;
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
