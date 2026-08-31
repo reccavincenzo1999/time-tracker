@@ -831,7 +831,7 @@ function renderEntries() {
                         ${lunchBreakSection}
                         <div class="entry-actions">
                             ${lunchBreakBtn}
-                            <button type="button" class="btn-edit" onclick="event.stopPropagation(); editEntry('${entry.id}')">Modifica</button>
+                            ${entry.type !== 'smartWorking' ? `<button type="button" class="btn-edit" onclick="event.stopPropagation(); editEntry('${entry.id}')">Modifica</button>` : ''}
                             <button type="button" class="btn-delete" onclick="event.stopPropagation(); deleteEntry('${entry.id}')">Elimina</button>
                         </div>
                     </div>
