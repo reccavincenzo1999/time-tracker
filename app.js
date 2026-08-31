@@ -1,4 +1,4 @@
-// Configuration - REPLACE WITH YOUR VALUES
+﻿// Configuration - REPLACE WITH YOUR VALUES
 const CONFIG = {
     apiKey: 'AIzaSyAzOowlr95IQNwC3RSEH6nZH5fZObgRD_E',
     spreadsheetId: '1DAgMwHbxGp-8OMtCrk6JlB6MFSdjzxlL05oW2wV-a50',
@@ -8,6 +8,9 @@ const CONFIG = {
 
 // State Management
 let workEntries = [];
+let vacationEntries = [];
+let calendarYear = new Date().getFullYear();
+let calendarMonth = new Date().getMonth();
 let currentEditingEntry = null;
 let currentEntryEditId = null;
 let expectedEdited = false;
@@ -66,9 +69,14 @@ const elements = {
 // Initialize App
 function init() {
     loadLocalEntries();
+    loadLocalVacations();
     renderEntries();
     setupEventListeners();
     setDefaultDateTime();
+    updateHeaderDate();
+    updateWeekRange();
+    initTabNavigation();
+    updateHeaderAvatar();
 }
 
 // Event Listeners
@@ -112,6 +120,25 @@ function setupEventListeners() {
     });
     elements.lunchBreakModal.addEventListener('click', (e) => {
         if (e.target === elements.lunchBreakModal) closeLunchBreakModal();
+    });
+
+    // Ferie modal
+    document.getElementById('addFerieBtn').addEventListener('click', openFerieModal);
+    document.getElementById('closeFerieModal').addEventListener('click', closeFerieModal);
+    document.getElementById('cancelFerieBtn').addEventListener('click', closeFerieModal);
+    document.getElementById('saveFerieBtn').addEventListener('click', saveFerieEntry);
+    document.getElementById('ferieModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('ferieModal')) closeFerieModal();
+    });
+    document.getElementById('calPrevMonth').addEventListener('click', () => {
+        calendarMonth--;
+        if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+        renderCalendarGrid(calendarYear, calendarMonth);
+    });
+    document.getElementById('calNextMonth').addEventListener('click', () => {
+        calendarMonth++;
+        if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+        renderCalendarGrid(calendarYear, calendarMonth);
     });
 
     // Delegato unico per la gestione dei click dinamici nella lista ingressi
@@ -737,18 +764,41 @@ function renderEntries() {
                 ? `<button type="button" class="btn-add-lunch" onclick="event.stopPropagation(); addLunchBreak('${entry.id}')">Pausa Pranzo</button>`
                 : '';
 
+            const _days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+            const _dayName = _days[clockIn.getDay()];
+            const _dayNum  = clockIn.getDate();
+            const _ciStr = `${String(clockIn.getHours()).padStart(2,'0')}:${String(clockIn.getMinutes()).padStart(2,'0')}`;
+            const _coStr = clockOut
+                ? `${String(clockOut.getHours()).padStart(2,'0')}:${String(clockOut.getMinutes()).padStart(2,'0')}`
+                : entry.expectedClockOutTime
+                    ? `${String(new Date(entry.expectedClockOutTime).getHours()).padStart(2,'0')}:${String(new Date(entry.expectedClockOutTime).getMinutes()).padStart(2,'0')}*`
+                    : '--';
+            const _timeRange  = `${_ciStr} – ${_coStr}`;
+            const _hoursDisp  = formattedWorked !== null ? formattedWorked : '-- h';
+            const _isComplete = clockOut !== null;
+
             return `
                 <div class="entry-card ${isCardCollapsed ? 'collapsed' : ''}" data-entry-id="${entry.id}">
                     <div class="entry-card-header" onclick="toggleCard(this)">
-                        <div class="entry-header-left">
-                            <span class="entry-label">Entrata:</span>
-                            <strong class="entry-value">${formatDate(clockIn)}</strong>
+                        <div class="entry-day-box">
+                            <span class="entry-day-abbr">${_dayName}</span>
+                            <span class="entry-day-num">${_dayNum}</span>
                         </div>
-                        <button type="button" class="btn-toggle-card" aria-label="Comprimi o espandi" onclick="event.stopPropagation(); toggleCard(this.parentElement)">
-                            <span class="chevron">▼</span>
-                        </button>
+                        <div class="entry-card-info">
+                            <div class="entry-card-top">
+                                <span class="entry-hours-worked">${_hoursDisp}</span>
+                                <svg class="entry-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="entry-card-mid">Poste Italiane</div>
+                            <div class="entry-card-bottom">
+                                <span class="entry-time-range">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    ${_timeRange}
+                                </span>
+                                <span class="entry-status-badge ${_isComplete ? '' : 'pending'}">${_isComplete ? '&#10003; Completato' : '&#8987; In corso'}</span>
+                            </div>
+                        </div>
                     </div>
-
                     <div class="entry-card-body">
                         <div class="entry-row">
                             <span class="entry-label">Uscita Prevista:</span>
@@ -756,7 +806,7 @@ function renderEntries() {
                         </div>
                         <div class="entry-row">
                             <span class="entry-label">Uscita Effettiva:</span>
-                            ${clockOut 
+                            ${clockOut
                                 ? `<span class="entry-value success">${formatDate(clockOut)}</span>`
                                 : `<button type="button" class="btn-add-clockout" data-id="${entry.id}">Aggiungi</button>`
                             }
@@ -781,13 +831,14 @@ function renderEntries() {
         return `
             <section class="week-group ${isWeekCollapsed ? 'collapsed' : ''}" data-week-key="${key}">
                 <div class="week-header" onclick="toggleWeekGroup(this)">
-                    <div>
-                        <span class="week-title">Settimana ${group.week} (${group.year})</span>
-                        <span class="week-count">${group.entries.length} ingressi</span>
+                    <div class="week-header-left">
+                        <span class="week-title">Sett. ${group.week} &middot; ${group.year}</span>
+                        <span class="week-count">${group.entries.length} ${group.entries.length === 1 ? 'giorno' : 'giorni'}</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button type="button" class="btn-delete-week" title="Elimina intera settimana" onclick="event.stopPropagation(); deleteWeek('${key}')" style="background:none; border:none; color:#dc3545; cursor:pointer; font-size:1.1rem; padding:2px 6px;">🗑️</button>
-                        <span class="week-toggle-icon">▼</span>
+                    <div class="week-header-right">
+                        <span class="week-date-range">${getWeekDateRange(group.year, group.week)}</span>
+                        <button type="button" class="btn-delete-week" title="Elimina intera settimana" onclick="event.stopPropagation(); deleteWeek('${key}')"><svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2'/></svg></button>
+                        <span class="week-toggle-icon">&#9660;</span>
                     </div>
                 </div>
                 <div class="week-content">
@@ -796,6 +847,7 @@ function renderEntries() {
             </section>
         `;
     }).join('');
+    updateTodaySummary();
 }
 
 // Local Storage
@@ -920,6 +972,364 @@ async function syncToGoogleSheets(entry, action) {
     } finally {
         hideLoading();
     }
+}
+
+// ── UI helpers ──
+function getWeekDateRange(year, week) {
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const dow = jan4.getUTCDay() || 7;
+    const ws = new Date(jan4);
+    ws.setUTCDate(jan4.getUTCDate() - (dow - 1) + (week - 1) * 7);
+    const we = new Date(ws);
+    we.setUTCDate(ws.getUTCDate() + 6);
+    const M = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+    return ws.getUTCMonth() === we.getUTCMonth()
+        ? `${ws.getUTCDate()} - ${we.getUTCDate()} ${M[we.getUTCMonth()]}`
+        : `${ws.getUTCDate()} ${M[ws.getUTCMonth()]} - ${we.getUTCDate()} ${M[we.getUTCMonth()]}`;
+}
+
+function updateHeaderDate() {
+    const el = document.getElementById('headerDate');
+    if (!el) return;
+    const now = new Date();
+    const D = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+    const M = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+    el.textContent = `${D[now.getDay()]}, ${now.getDate()} ${M[now.getMonth()]} ${now.getFullYear()}`;
+}
+
+function updateWeekRange() {
+    const el = document.getElementById('weekRange');
+    if (!el) return;
+    const now = new Date();
+    el.textContent = getWeekDateRange(now.getFullYear(), getWeekNumber(now));
+}
+
+function updateTodaySummary() {
+    const el = document.getElementById('todayHours');
+    if (!el) return;
+    const now = new Date();
+    const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const todays = workEntries.filter(e => {
+        const d = new Date(e.clockInTime);
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` === ts;
+    });
+    if (todays.length === 0) { el.textContent = '-- h --'; return; }
+    let total = 0;
+    todays.forEach(e => {
+        const ci = new Date(e.clockInTime);
+        const co = e.clockOutTime ? new Date(e.clockOutTime) : new Date();
+        const raw = Math.max(0, Math.round((co - ci) / 60000));
+        const lm = getLunchBreakMinutes(e);
+        total += Math.max(0, raw - (lm > 30 ? lm - 30 : 0));
+    });
+    el.textContent = `${Math.floor(total/60)}h ${String(total%60).padStart(2,'0')}m`;
+}
+
+function initTabNavigation() {
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', function() { switchView(this.getAttribute('data-view')); });
+    });
+}
+
+function switchView(viewName) {
+    document.querySelectorAll('.nav-item').forEach(b =>
+        b.classList.toggle('active', b.getAttribute('data-view') === viewName)
+    );
+    document.querySelectorAll('.main-view').forEach(v => v.classList.add('hidden'));
+    const target = document.getElementById(`view${viewName}`);
+    if (target) target.classList.remove('hidden');
+    // Toggle FABs based on active view
+    const mainFab = document.getElementById('addBtn');
+    const ferieFab = document.getElementById('addFerieBtn');
+    if (mainFab) mainFab.classList.toggle('hidden', viewName !== 'Home');
+    if (ferieFab) ferieFab.classList.toggle('hidden', viewName !== 'Calendario');
+    if (viewName === 'Profilo') renderProfile();
+    if (viewName === 'Calendario') renderCalendar();
+}
+
+function loadUserProfile() {
+    const s = localStorage.getItem('userProfile');
+    return s ? JSON.parse(s) : {};
+}
+
+function saveUserProfile(data) {
+    localStorage.setItem('userProfile', JSON.stringify(data));
+}
+
+function updateHeaderAvatar() {
+    const p = loadUserProfile();
+    const avatar = document.querySelector('.user-avatar');
+    if (!avatar) return;
+    if (p.photo) {
+        avatar.innerHTML = '<img src="' + p.photo + '" alt="Profilo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else if (p.nome || p.cognome) {
+        const initials = ((p.nome || '').charAt(0) + (p.cognome || '').charAt(0)).toUpperCase();
+        avatar.innerHTML = '<span style="font-size:.85rem;font-weight:800;color:white;letter-spacing:.02em;">' + initials + '</span>';
+    } else {
+        avatar.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
+    }
+}
+
+window.handleProfilePhoto = function(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const p = loadUserProfile();
+        p.photo = e.target.result;
+        saveUserProfile(p);
+        updateHeaderAvatar();
+        renderProfile();
+    };
+    reader.readAsDataURL(input.files[0]);
+};
+
+window.saveProfileData = function() {
+    const p = loadUserProfile();
+    p.nome      = (document.getElementById('pNome')?.value      || '').trim();
+    p.cognome   = (document.getElementById('pCognome')?.value   || '').trim();
+    p.email     = (document.getElementById('pEmail')?.value     || '').trim();
+    p.matricola = (document.getElementById('pMatricola')?.value || '').trim();
+    saveUserProfile(p);
+    updateHeaderAvatar();
+    renderProfile();
+    const btn = document.querySelector('.btn-save-profile');
+    if (btn) { btn.textContent = '\u2713 Salvato!'; setTimeout(() => { btn.textContent = 'Salva Dati'; }, 1500); }
+};
+
+function renderProfile() {
+    const el = document.getElementById('profileStats');
+    if (!el) return;
+    const now = new Date();
+    const tm = now.getMonth(), ty = now.getFullYear();
+    const MN = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+    const mEntries = workEntries.filter(e => { const d = new Date(e.clockInTime); return d.getMonth()===tm && d.getFullYear()===ty; });
+    let totalMins = 0, completedDays = 0;
+    mEntries.forEach(e => {
+        if (!e.clockOutTime) return;
+        completedDays++;
+        const ci = new Date(e.clockInTime), co = new Date(e.clockOutTime);
+        const raw = Math.max(0, Math.round((co-ci)/60000));
+        const lm = getLunchBreakMinutes(e);
+        totalMins += Math.max(0, raw - (lm > 30 ? lm-30 : 0));
+    });
+    const tH = Math.floor(totalMins/60), tM = totalMins%60;
+    const avgM = completedDays > 0 ? Math.round(totalMins/completedDays) : 0;
+    const aH = Math.floor(avgM/60), aM = avgM%60;
+    const p = loadUserProfile();
+    const photoHTML = p.photo
+        ? '<img src="' + p.photo + '" alt="Foto profilo">'
+        : '<svg width="38" height="38" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
+    const displayName = [p.nome, p.cognome].filter(Boolean).join(' ') || 'Il tuo nome';
+    const displaySub  = p.email || 'Poste Italiane';
+    el.innerHTML = `
+        <div class="profile-header-card">
+            <div class="profile-photo-wrap" onclick="document.getElementById('profilePhotoInput').click()">
+                ${photoHTML}
+                <div class="photo-overlay-icon">&#128247;</div>
+            </div>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="handleProfilePhoto(this)">
+            <div class="profile-name-display">${displayName}</div>
+            <p class="profile-role-text">${displaySub}</p>
+        </div>
+        <div class="profile-info-card">
+            <h3>Dati Personali</h3>
+            <div class="form-group">
+                <label for="pNome">Nome</label>
+                <input type="text" id="pNome" placeholder="Mario" value="${p.nome || ''}">
+            </div>
+            <div class="form-group">
+                <label for="pCognome">Cognome</label>
+                <input type="text" id="pCognome" placeholder="Rossi" value="${p.cognome || ''}">
+            </div>
+            <div class="form-group">
+                <label for="pEmail">Email Aziendale</label>
+                <input type="text" id="pEmail" placeholder="m.rossi@poste.it" value="${p.email || ''}">
+            </div>
+            <div class="form-group">
+                <label for="pMatricola">Matricola</label>
+                <input type="text" id="pMatricola" placeholder="ES1234567" value="${p.matricola || ''}">
+            </div>
+            <button class="btn btn-primary btn-save-profile" onclick="saveProfileData()">Salva Dati</button>
+        </div>
+        <p class="profile-stats-section-title">Statistiche</p>
+        <div class="profile-stats-grid">
+            <div class="stat-card"><p class="stat-value">${workEntries.length}</p><p class="stat-label">Ingressi Totali</p></div>
+            <div class="stat-card"><p class="stat-value">${tH}h ${String(tM).padStart(2,'0')}m</p><p class="stat-label">Ore ${MN[tm]}</p></div>
+            <div class="stat-card"><p class="stat-value">${completedDays}</p><p class="stat-label">Giorni Completati</p></div>
+            <div class="stat-card"><p class="stat-value">${aH}h ${String(aM).padStart(2,'0')}m</p><p class="stat-label">Media Giornaliera</p></div>
+        </div>`;
+}
+
+function loadVacationBudget() {
+    return parseInt(localStorage.getItem('vacationBudget') || '32', 10);
+}
+
+function saveVacationBudget(n) {
+    localStorage.setItem('vacationBudget', String(n));
+}
+
+window.openBudgetEdit = function() {
+    const edit = document.getElementById('calBudgetEdit');
+    if (!edit) return;
+    document.getElementById('calBudgetInput').value = loadVacationBudget();
+    edit.classList.remove('hidden');
+    document.getElementById('calBudgetInput').focus();
+};
+
+window.closeBudgetEdit = function() {
+    document.getElementById('calBudgetEdit')?.classList.add('hidden');
+};
+
+window.saveBudgetEdit = function() {
+    const v = parseInt(document.getElementById('calBudgetInput').value, 10);
+    if (isNaN(v) || v < 1) return;
+    saveVacationBudget(v);
+    closeBudgetEdit();
+    renderCalendarSummary();
+};
+
+// ── VACATION DATA ──
+function loadLocalVacations() {
+    const s = localStorage.getItem('vacationEntries');
+    vacationEntries = s ? JSON.parse(s) : [];
+}
+
+function saveLocalVacations() {
+    localStorage.setItem('vacationEntries', JSON.stringify(vacationEntries));
+}
+
+function openFerieModal() {
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('ferieStartDate').value = today;
+    document.getElementById('ferieEndDate').value = today;
+    document.getElementById('ferieNote').value = '';
+    document.getElementById('ferieModal').classList.remove('hidden');
+}
+
+function closeFerieModal() {
+    document.getElementById('ferieModal').classList.add('hidden');
+}
+
+function saveFerieEntry() {
+    const start = document.getElementById('ferieStartDate').value;
+    const end   = document.getElementById('ferieEndDate').value;
+    const note  = document.getElementById('ferieNote').value.trim();
+    if (!start || !end || start > end) {
+        alert('Seleziona un intervallo di date valido.');
+        return;
+    }
+    vacationEntries.push({ id: Date.now().toString(), startDate: start, endDate: end, note });
+    saveLocalVacations();
+    closeFerieModal();
+    renderCalendar();
+}
+
+window.deleteFerieEntry = function(id) {
+    vacationEntries = vacationEntries.filter(v => v.id !== id);
+    saveLocalVacations();
+    renderCalendar();
+};
+
+// ── CALENDAR RENDERING ──
+function renderCalendar() {
+    renderCalendarSummary();
+    renderCalendarGrid(calendarYear, calendarMonth);
+    renderVacationList();
+}
+
+function renderCalendarSummary() {
+    const budget = loadVacationBudget();
+    const year = new Date().getFullYear();
+    let vacDays = 0;
+    vacationEntries.forEach(v => {
+        const cur = new Date(v.startDate);
+        const end = new Date(v.endDate);
+        while (cur <= end) {
+            if (cur.getFullYear() === year) vacDays++;
+            cur.setDate(cur.getDate() + 1);
+        }
+    });
+    const remaining = budget - vacDays;
+    const elB = document.getElementById('calVacBudget');
+    const elU = document.getElementById('calVacUsed');
+    const elR = document.getElementById('calVacRemaining');
+    if (elB) elB.textContent = budget;
+    if (elU) elU.textContent = vacDays;
+    if (elR) {
+        elR.textContent = remaining;
+        elR.style.color = remaining < 0 ? 'var(--danger-color)' : '';
+    }
+}
+
+function renderCalendarGrid(year, month) {
+    const MN = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+    const titleEl = document.getElementById('calMonthTitle');
+    if (titleEl) titleEl.textContent = `${MN[month]} ${year}`;
+    const grid = document.getElementById('calGrid');
+    if (!grid) return;
+    // Set of days with work entries
+    const workedSet = new Set();
+    workEntries.forEach(e => {
+        const d = new Date(e.clockInTime);
+        if (d.getFullYear() === year && d.getMonth() === month) workedSet.add(d.getDate());
+    });
+    // Set of vacation days
+    const vacSet = new Set();
+    vacationEntries.forEach(v => {
+        const cur = new Date(v.startDate);
+        const end = new Date(v.endDate);
+        while (cur <= end) {
+            if (cur.getFullYear() === year && cur.getMonth() === month) vacSet.add(cur.getDate());
+            cur.setDate(cur.getDate() + 1);
+        }
+    });
+    const firstDay = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+    const startOffset = (firstDay.getDay() + 6) % 7; // Monday-first
+    let html = '';
+    for (let i = 0; i < startOffset; i++) html += '<div class="cal-day cal-day-empty"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dow = (startOffset + d - 1) % 7;
+        const isWeekend = dow >= 5;
+        const isToday = isCurrentMonth && today.getDate() === d;
+        const isVacation = vacSet.has(d);
+        const isWorked = workedSet.has(d);
+        let cls = 'cal-day';
+        if (isWeekend) cls += ' cal-day-weekend';
+        if (isToday) cls += ' cal-day-today';
+        if (isVacation) cls += ' cal-day-vacation';
+        else if (isWorked) cls += ' cal-day-work';
+        html += `<div class="${cls}">${d}</div>`;
+    }
+    grid.innerHTML = html;
+}
+
+function renderVacationList() {
+    const el = document.getElementById('calVacationList');
+    if (!el) return;
+    if (vacationEntries.length === 0) {
+        el.innerHTML = '';
+        return;
+    }
+    const MN = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+    const fmt = iso => { const d = new Date(iso); return `${d.getDate()} ${MN[d.getMonth()]} ${d.getFullYear()}`; };
+    const rows = vacationEntries.slice().reverse().map(v => {
+        const range = v.startDate === v.endDate ? fmt(v.startDate) : `${fmt(v.startDate)} – ${fmt(v.endDate)}`;
+        return `<div class="cal-vacation-item">
+            <div class="cal-vacation-info">
+                <span class="cal-vacation-range">${range}</span>
+                ${v.note ? `<span class="cal-vacation-note">${v.note}</span>` : ''}
+            </div>
+            <button class="btn-delete-week" onclick="deleteFerieEntry('${v.id}')" aria-label="Elimina ferie" title="Elimina">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+            </button>
+        </div>`;
+    }).join('');
+    el.innerHTML = `<p class="profile-stats-section-title" style="margin-top:1rem">Ferie Registrate</p>${rows}`;
 }
 
 // Start App

@@ -1,15 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Poste Time Tracker">
-    <meta name="theme-color" content="#FFD700">
-    
+    <meta name="theme-color" content="#00428c">
     <title>Poste Time Tracker</title>
-    
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" href="icon-192.png">
@@ -17,42 +15,165 @@
 </head>
 <body>
     <div class="app">
-        <!-- Header -->
+
+        <!-- DARK HEADER -->
         <header class="header">
-            <div class="header-brand">
-                <div class="logo">
-                    <img src="icon-192.png" alt="Poste Logo" width="32" height="32">
+            <div class="header-top">
+                <div class="header-brand">
+                    <div class="logo">
+                        <img src="icon-192.png" alt="Poste Logo" width="36" height="36">
+                    </div>
+                    <div class="header-title-group">
+                        <h1>Poste Time Tracker</h1>
+                        <p class="header-date" id="headerDate"></p>
+                    </div>
                 </div>
-                <h1>Poste Time Tracker</h1>
+                <div class="user-avatar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                    </svg>
+                </div>
             </div>
-            <button id="addBtn" class="btn-icon" aria-label="Aggiungi">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-            </button>
+
+            <!-- Summary Card -->
+            <div class="summary-card">
+                <div class="summary-left">
+                    <p class="summary-label">Riepilogo Oggi</p>
+                    <p class="summary-hours" id="todayHours">-- h --</p>
+                </div>
+                <div class="summary-right">
+                    <span class="summary-tracked" id="trackingStatus">&#x25cf; Tracciato</span>
+                    <span class="summary-target">Target: 8 h 00 m</span>
+                </div>
+            </div>
         </header>
 
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="loading hidden">
-            <div class="spinner"></div>
-            <p>Caricamento...</p>
-        </div>
+        <!-- CONTENT SHELL -->
+        <div class="content-shell">
 
-        <!-- Error Message -->
-        <div id="errorMessage" class="error-message hidden"></div>
+            <div id="loadingIndicator" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Caricamento...</p>
+            </div>
+            <div id="errorMessage" class="error-message hidden"></div>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <section class="entries-section">
-                <h2>Storico Ingressi</h2>
+            <!-- View: Home -->
+            <main class="main-view" id="viewHome">
+                <div class="section-header">
+                    <h2>Ingressi Settimanali</h2>
+                    <span class="section-date-range" id="weekRange"></span>
+                </div>
                 <div id="entriesList" class="entries-list">
                     <p class="empty-state">Nessun ingresso registrato</p>
                 </div>
-            </section>
-        </main>
+            </main>
 
-        <!-- Add Entry Modal -->
+            <!-- View: Calendario -->
+            <main class="main-view hidden" id="viewCalendario">
+                <!-- Budget ferie -->
+                <div class="cal-summary-strip">
+                    <div class="cal-summary-item cal-budget-item" onclick="openBudgetEdit()" title="Tocca per modificare">
+                        <div class="cal-budget-value-row">
+                            <span class="cal-edit-badge">✎</span>
+                            <span class="cal-summary-value" id="calVacBudget">32</span>
+                        </div>
+                        <span class="cal-summary-label">Totale Ferie</span>
+                    </div>
+                    <div class="cal-summary-sep"></div>
+                    <div class="cal-summary-item">
+                        <span class="cal-summary-value cal-used" id="calVacUsed">0</span>
+                        <span class="cal-summary-label">Usufruiti</span>
+                    </div>
+                    <div class="cal-summary-sep"></div>
+                    <div class="cal-summary-item">
+                        <span class="cal-summary-value cal-remaining" id="calVacRemaining">32</span>
+                        <span class="cal-summary-label">Rimanenti</span>
+                    </div>
+                </div>
+                <!-- Modifica budget inline -->
+                <div class="cal-budget-edit hidden" id="calBudgetEdit">
+                    <span class="cal-budget-edit-label">Giorni di ferie contrattuali</span>
+                    <div class="cal-budget-edit-row">
+                        <input type="number" id="calBudgetInput" min="1" max="365" placeholder="Es. 32">
+                        <button class="btn btn-primary btn-sm" onclick="saveBudgetEdit()">Salva</button>
+                        <button class="btn btn-secondary btn-sm" onclick="closeBudgetEdit()">Annulla</button>
+                    </div>
+                </div>
+
+                <!-- Navigazione mese -->
+                <div class="cal-month-nav">
+                    <button class="cal-nav-btn" id="calPrevMonth">&#8249;</button>
+                    <span class="cal-month-title" id="calMonthTitle">Agosto 2026</span>
+                    <button class="cal-nav-btn" id="calNextMonth">&#8250;</button>
+                </div>
+
+                <!-- Griglia calendario -->
+                <div class="cal-grid-wrap">
+                    <div class="cal-weekdays">
+                        <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+                    </div>
+                    <div class="cal-grid" id="calGrid"></div>
+                </div>
+
+                <!-- Legenda -->
+                <div class="cal-legend">
+                    <div class="cal-legend-item"><span class="cal-dot cal-dot-work"></span>Lavorato</div>
+                    <div class="cal-legend-item"><span class="cal-dot cal-dot-vacation"></span>Ferie</div>
+                </div>
+
+                <!-- Lista ferie salvate -->
+                <div class="cal-vacation-list" id="calVacationList"></div>
+            </main>
+
+            <!-- View: Profilo -->
+            <main class="main-view hidden" id="viewProfilo">
+                <div class="section-header">
+                    <h2>Profilo &amp; Statistiche</h2>
+                </div>
+                <div id="profileStats"></div>
+            </main>
+
+        </div><!-- /.content-shell -->
+
+        <!-- FAB Home (ingressi) -->
+        <button id="addBtn" class="fab-btn" aria-label="Aggiungi ingresso">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+        <!-- FAB Calendario (ferie) -->
+        <button id="addFerieBtn" class="fab-btn fab-btn-green hidden" aria-label="Aggiungi ferie">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="Home" aria-label="Home">
+                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" data-view="Calendario" aria-label="Calendario">
+                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+                </svg>
+                <span class="nav-label">Calendario</span>
+            </button>
+            <button class="nav-item" data-view="Profilo" aria-label="Profilo">
+                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                </svg>
+                <span class="nav-label">Profilo</span>
+            </button>
+        </nav>
+
+        <!-- MODALS -->
+
         <div id="addModal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
@@ -68,7 +189,6 @@
                         <label for="clockInTime">Ora Entrata</label>
                         <input type="time" id="clockInTime" required>
                     </div>
-                    
                     <div class="expected-info">
                         <strong>Uscita Prevista (default 8 ore):</strong>
                         <div class="form-group">
@@ -76,14 +196,12 @@
                             <input type="time" id="expectedTime" class="expected-time-input" required>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="hasClockOut">
                             <span>Aggiungi uscita effettiva</span>
                         </label>
                     </div>
-
                     <div id="clockOutGroup" class="clock-out-group hidden">
                         <div class="form-group">
                             <label for="clockOutTime">Ora Uscita</label>
@@ -98,7 +216,6 @@
             </div>
         </div>
 
-        <!-- Edit Clock Out Modal -->
         <div id="editModal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
@@ -114,7 +231,6 @@
                         <label for="editClockOutTime">Ora Uscita</label>
                         <input type="time" id="editClockOutTime" required>
                     </div>
-
                     <div class="info-row">
                         <strong>Ore Lavorate:</strong>
                         <span id="calculatedHours">0.00 ore</span>
@@ -127,7 +243,6 @@
             </div>
         </div>
 
-        <!-- Lunch Break Actual End Modal -->
         <div id="lunchActualEndModal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
@@ -151,7 +266,6 @@
             </div>
         </div>
 
-        <!-- Lunch Break Modal -->
         <div id="lunchBreakModal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
@@ -192,15 +306,43 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Modal: Aggiungi Ferie -->
+        <div id="ferieModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Aggiungi Ferie</h2>
+                    <button id="closeFerieModal" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="ferieStartDate">Data Inizio</label>
+                        <input type="date" id="ferieStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="ferieEndDate">Data Fine</label>
+                        <input type="date" id="ferieEndDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="ferieNote">Note <span style="font-weight:400;color:#94a3b8">(opzionale)</span></label>
+                        <input type="text" id="ferieNote" placeholder="Es. Vacanze estive">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelFerieBtn" class="btn btn-secondary">Annulla</button>
+                    <button id="saveFerieBtn" class="btn btn-primary">Salva</button>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.app -->
 
     <script src="app.js"></script>
     <script>
-        // Register Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')
                 .then(() => console.log('Service Worker registered'))
-                .catch(err => console.error('Service Worker registration failed:', err));
+                .catch(err => console.error('SW error:', err));
         }
     </script>
 </body>
