@@ -76,6 +76,8 @@ function init() {
     updateWeekRange();
     initTabNavigation();
     updateHeaderAvatar();
+    // Mostra i FAB della Home al caricamento iniziale
+    document.getElementById('addSmartBtn')?.classList.remove('hidden');
 }
 
 // Event Listeners
@@ -120,6 +122,16 @@ function setupEventListeners() {
     elements.lunchBreakModal.addEventListener('click', (e) => {
         if (e.target === elements.lunchBreakModal) closeLunchBreakModal();
     });
+
+    // Smart working modal
+    document.getElementById('addSmartBtn').addEventListener('click', openSmartWorkingModal);
+    document.getElementById('closeSmartModal').addEventListener('click', closeSmartWorkingModal);
+    document.getElementById('cancelSmartBtn').addEventListener('click', closeSmartWorkingModal);
+    document.getElementById('saveSmartBtn').addEventListener('click', saveSmartWorkingEntry);
+    document.getElementById('smartWorkingModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('smartWorkingModal')) closeSmartWorkingModal();
+    });
+    document.getElementById('smartDate').addEventListener('change', updateSmartHoursPreview);
 
     // Ferie modal
     document.getElementById('addFerieBtn').addEventListener('click', openFerieModal);
@@ -759,7 +771,7 @@ function renderEntries() {
                     </div>`;
             }
 
-            const lunchBreakBtn = !hasLunchBreak
+            const lunchBreakBtn = !hasLunchBreak && entry.type !== 'smartWorking'
                 ? `<button type="button" class="btn-add-lunch" onclick="event.stopPropagation(); addLunchBreak('${entry.id}')">Pausa Pranzo</button>`
                 : '';
 
@@ -779,7 +791,7 @@ function renderEntries() {
             return `
                 <div class="entry-card ${isCardCollapsed ? 'collapsed' : ''}" data-entry-id="${entry.id}">
                     <div class="entry-card-header" onclick="toggleCard(this)">
-                        <div class="entry-day-box">
+                        <div class="entry-day-box${entry.type === 'smartWorking' ? ' smart' : ''}">
                             <span class="entry-day-abbr">${_dayName}</span>
                             <span class="entry-day-num">${_dayNum}</span>
                         </div>
@@ -788,7 +800,7 @@ function renderEntries() {
                                 <span class="entry-hours-worked">${_hoursDisp}</span>
                                 <svg class="entry-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
-                            <div class="entry-card-mid">Poste Italiane</div>
+                            <div class="entry-card-mid${entry.type === 'smartWorking' ? ' smart-working' : ''}">${entry.type === 'smartWorking' ? '&#127968; Smart Working' : 'Poste Italiane'}</div>
                             <div class="entry-card-bottom">
                                 <span class="entry-time-range">
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1040,8 +1052,10 @@ function switchView(viewName) {
     // Toggle FABs based on active view
     const mainFab = document.getElementById('addBtn');
     const ferieFab = document.getElementById('addFerieBtn');
+    const smartFab = document.getElementById('addSmartBtn');
     if (mainFab) mainFab.classList.toggle('hidden', viewName !== 'Home');
     if (ferieFab) ferieFab.classList.toggle('hidden', viewName !== 'Calendario');
+    if (smartFab) smartFab.classList.toggle('hidden', viewName !== 'Home');
     if (viewName === 'Profilo') renderProfile();
     if (viewName === 'Calendario') renderCalendar();
 }
@@ -1282,6 +1296,14 @@ function renderCalendarGrid(year, month) {
             cur.setDate(cur.getDate() + 1);
         }
     });
+    // Set of smart working days
+    const smartSet = new Set();
+    workEntries.forEach(e => {
+        if (e.type === 'smartWorking') {
+            const d = new Date(e.clockInTime);
+            if (d.getFullYear() === year && d.getMonth() === month) smartSet.add(d.getDate());
+        }
+    });
     const firstDay = new Date(year, month, 1);
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
@@ -1299,6 +1321,7 @@ function renderCalendarGrid(year, month) {
         if (isWeekend) cls += ' cal-day-weekend';
         if (isToday) cls += ' cal-day-today';
         if (isVacation) cls += ' cal-day-vacation';
+        else if (smartSet.has(d)) cls += ' cal-day-smart';
         else if (isWorked) cls += ' cal-day-work';
         html += `<div class="${cls}">${d}</div>`;
     }
@@ -1329,6 +1352,58 @@ function renderVacationList() {
         </div>`;
     }).join('');
     el.innerHTML = `<p class="profile-stats-section-title" style="margin-top:1rem">Ferie Registrate</p>${rows}`;
+}
+
+// ── SMART WORKING ──
+function getSmartHours(dateStr) {
+    const d = new Date(dateStr);
+    const dow = d.getDay(); // 0=Dom, 5=Ven
+    return dow === 5
+        ? { start: '08:00', end: '14:00', hours: 6 }
+        : { start: '08:00', end: '16:00', hours: 8 };
+}
+
+function openSmartWorkingModal() {
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('smartDate').value = today;
+    updateSmartHoursPreview();
+    document.getElementById('smartWorkingModal').classList.remove('hidden');
+}
+
+function closeSmartWorkingModal() {
+    document.getElementById('smartWorkingModal').classList.add('hidden');
+}
+
+function updateSmartHoursPreview() {
+    const dateStr = document.getElementById('smartDate').value;
+    if (!dateStr) return;
+    const h = getSmartHours(dateStr);
+    const el = document.getElementById('smartHoursPreview');
+    if (el) el.textContent = `${h.start} – ${h.end} (${h.hours}h)`;
+}
+
+function saveSmartWorkingEntry() {
+    const dateStr = document.getElementById('smartDate').value;
+    if (!dateStr) return;
+    const h = getSmartHours(dateStr);
+    const clockIn  = new Date(`${dateStr}T${h.start}:00`);
+    const clockOut = new Date(`${dateStr}T${h.end}:00`);
+    const entry = {
+        id: Date.now().toString(),
+        type: 'smartWorking',
+        clockInTime: clockIn.toISOString(),
+        expectedClockOutTime: clockOut.toISOString(),
+        clockOutTime: clockOut.toISOString(),
+        lunchBreakStart: null,
+        lunchBreakExpectedEnd: null,
+        lunchBreakActualEnd: null,
+        lunchBreakMinutes: null
+    };
+    workEntries.push(entry);
+    saveLocalEntries();
+    renderEntries();
+    updateTodaySummary();
+    closeSmartWorkingModal();
 }
 
 // Start App

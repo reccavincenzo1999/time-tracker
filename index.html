@@ -117,7 +117,8 @@
 
                 <!-- Legenda -->
                 <div class="cal-legend">
-                    <div class="cal-legend-item"><span class="cal-dot cal-dot-work"></span>Lavorato</div>
+                    <div class="cal-legend-item"><span class="cal-dot cal-dot-work"></span>Ufficio</div>
+                    <div class="cal-legend-item"><span class="cal-dot cal-dot-smart"></span>Smart W.</div>
                     <div class="cal-legend-item"><span class="cal-dot cal-dot-vacation"></span>Ferie</div>
                 </div>
 
@@ -135,6 +136,10 @@
 
         </div><!-- /.content-shell -->
 
+        <!-- FAB Smart Working (sinistra, solo Home) -->
+        <button id="addSmartBtn" class="fab-btn fab-btn-purple hidden" aria-label="Aggiungi smart working">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
         <!-- FAB Home (ingressi) -->
         <button id="addBtn" class="fab-btn" aria-label="Aggiungi ingresso">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -153,19 +158,19 @@
         <!-- BOTTOM NAV -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-view="Home" aria-label="Home">
-                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <svg class="nav-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                 </svg>
                 <span class="nav-label">Home</span>
             </button>
             <button class="nav-item" data-view="Calendario" aria-label="Calendario">
-                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <svg class="nav-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
                 </svg>
                 <span class="nav-label">Calendario</span>
             </button>
             <button class="nav-item" data-view="Profilo" aria-label="Profilo">
-                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <svg class="nav-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
                 </svg>
                 <span class="nav-label">Profilo</span>
@@ -303,6 +308,30 @@
                 <div class="modal-footer">
                     <button id="cancelLunchBreakBtn" class="btn btn-secondary">Annulla</button>
                     <button id="saveLunchBreakBtn" class="btn btn-primary">Salva</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Smart Working -->
+        <div id="smartWorkingModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Smart Working</h2>
+                    <button id="closeSmartModal" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="smartDate">Data</label>
+                        <input type="date" id="smartDate">
+                    </div>
+                    <div class="form-group" style="background:#f5f3ff;border-radius:10px;padding:.75rem;margin-top:.25rem;">
+                        <p style="font-size:.8rem;color:#7c3aed;font-weight:700;margin:0 0 .3rem">Orari automatici</p>
+                        <p style="font-size:.78rem;color:#64748b;margin:0" id="smartHoursPreview">Lun–Gio: 08:00 – 16:00 (8h) &nbsp;·&nbsp; Ven: 08:00 – 14:00 (6h)</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelSmartBtn" class="btn btn-secondary">Annulla</button>
+                    <button id="saveSmartBtn" class="btn btn-primary" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">Salva</button>
                 </div>
             </div>
         </div>
