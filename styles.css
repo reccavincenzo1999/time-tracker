@@ -1237,3 +1237,13 @@ select:focus { border-color: var(--primary-color); }
 .entry-day-box.smart {
     background: #ede9fe;
 }
+
+.btn-update-app {
+    width: 100%;
+    margin-top: 1rem;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    color: #64748b;
+    font-size: .82rem;
+}

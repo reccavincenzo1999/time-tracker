@@ -1170,7 +1170,11 @@ function renderProfile() {
             <div class="stat-card"><p class="stat-value">${tH}h ${String(tM).padStart(2,'0')}m</p><p class="stat-label">Ore ${MN[tm]}</p></div>
             <div class="stat-card"><p class="stat-value">${completedDays}</p><p class="stat-label">Giorni Completati</p></div>
             <div class="stat-card"><p class="stat-value">${aH}h ${String(aM).padStart(2,'0')}m</p><p class="stat-label">Media Giornaliera</p></div>
-        </div>`;
+        </div>
+        <button class="btn btn-secondary btn-update-app" onclick="forceAppUpdate()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:.4rem"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Aggiorna App
+        </button>`;
 }
 
 function loadVacationBudget() {
@@ -1405,6 +1409,20 @@ function saveSmartWorkingEntry() {
     updateTodaySummary();
     closeSmartWorkingModal();
 }
+
+window.forceAppUpdate = async function() {
+    const btn = document.querySelector('.btn-update-app');
+    if (btn) btn.textContent = 'Aggiornamento in corso…';
+    if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+    }
+    if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+    }
+    window.location.reload(true);
+};
 
 // Start App
 init();
