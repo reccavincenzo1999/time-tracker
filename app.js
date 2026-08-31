@@ -1,6 +1,5 @@
 ﻿// Configuration - REPLACE WITH YOUR VALUES
 const CONFIG = {
-    apiKey: 'AIzaSyAzOowlr95IQNwC3RSEH6nZH5fZObgRD_E',
     spreadsheetId: '1DAgMwHbxGp-8OMtCrk6JlB6MFSdjzxlL05oW2wV-a50',
     sheetName: 'TimeTracking',
     appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzWJ41h6zxfLUsKSY5GF9lOgaxUKCSc4MxQgqFAqzN6F4gdLJL6Rx_PSVJdudmWEAWRoQ/exec'
